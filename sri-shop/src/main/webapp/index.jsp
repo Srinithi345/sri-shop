@@ -3,7 +3,10 @@
 <%
     String userName = (String) session.getAttribute("userName");
     String userRole = (String) session.getAttribute("userRole");
+
     boolean loggedIn = userName != null && userRole != null;
+    boolean isBuyer = "BUYER".equalsIgnoreCase(userRole);
+    boolean isSeller = "SELLER".equalsIgnoreCase(userRole);
 %>
 
 <!DOCTYPE html>
@@ -72,10 +75,6 @@
             color: #d89b35;
         }
 
-        .nav-icon {
-            font-size: 18px;
-        }
-
         .nav-btn {
             padding: 10px 20px;
             border-radius: 25px;
@@ -132,43 +131,6 @@
             line-height: 1.7;
             color: #5d6573;
             margin-bottom: 25px;
-        }
-
-        /* ================= SEARCH ================= */
-
-        .search-box {
-            width: 100%;
-            max-width: 570px;
-            display: flex;
-            background: white;
-            border: 1px solid #e1e5eb;
-            border-radius: 35px;
-            padding: 6px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            margin-bottom: 28px;
-        }
-
-        .search-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 13px 18px;
-            font-size: 15px;
-            background: transparent;
-        }
-
-        .search-box button {
-            border: none;
-            background: #182b49;
-            color: white;
-            padding: 12px 23px;
-            border-radius: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .search-box button:hover {
-            background: #d89b35;
         }
 
         /* ================= BUTTONS ================= */
@@ -389,11 +351,6 @@
                 max-width: 700px;
             }
 
-            .search-box {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
             .hero-buttons {
                 justify-content: center;
             }
@@ -473,26 +430,72 @@
 
         <% if (loggedIn) { %>
 
+            <!-- HOME -->
+            <a href="${pageContext.request.contextPath}/">
+                Home
+            </a>
+
+            <!-- DASHBOARD -->
+            <% if (isBuyer) { %>
+
+                <a href="${pageContext.request.contextPath}/buyer-dashboard">
+                    Dashboard
+                </a>
+
+            <% } else if (isSeller) { %>
+
+                <a href="${pageContext.request.contextPath}/seller-dashboard">
+                    Dashboard
+                </a>
+
+            <% } %>
+
+
+            <!-- ACCESSORIES / PRODUCTS -->
             <a href="${pageContext.request.contextPath}/products">
-                👜 Accessories
+                Accessories
             </a>
 
-            <a href="${pageContext.request.contextPath}/wishlist">
-                ❤️ Wishlist
-            </a>
 
-            <a href="${pageContext.request.contextPath}/cart">
-                🛒 Cart
-            </a>
+            <!-- BUYER ONLY -->
+            <% if (isBuyer) { %>
 
-            <a href="${pageContext.request.contextPath}/buyer-dashboard"
-               class="profile-btn">
-                👤 <%= userName %>
-            </a>
+                <a href="${pageContext.request.contextPath}/wishlist">
+                    Wishlist
+                </a>
+
+                <a href="${pageContext.request.contextPath}/cart">
+                    Cart
+                </a>
+
+            <% } %>
+
+
+            <!-- PROFILE -->
+            <% if (isBuyer) { %>
+
+                <a href="${pageContext.request.contextPath}/buyer-dashboard"
+                   class="profile-btn">
+                    <%= userName %>
+                </a>
+
+            <% } else if (isSeller) { %>
+
+                <a href="${pageContext.request.contextPath}/seller-dashboard"
+                   class="profile-btn">
+                    <%= userName %>
+                </a>
+
+            <% } %>
+
 
         <% } else { %>
 
-            <a href="#home">Home</a>
+            <!-- GUEST NAVBAR -->
+
+            <a href="${pageContext.request.contextPath}/">
+                Home
+            </a>
 
             <a href="#categories">
                 Categories
@@ -531,25 +534,6 @@
         </p>
 
 
-        <!-- SEARCH -->
-
-        <form class="search-box"
-              action="${pageContext.request.contextPath}/products"
-              method="get">
-
-            <input
-                type="text"
-                name="search"
-                placeholder="🔍 Search dresses, shirts, shoes..."
-                autocomplete="off">
-
-            <button type="submit">
-                Search
-            </button>
-
-        </form>
-
-
         <div class="hero-buttons">
 
             <% if (loggedIn) { %>
@@ -559,19 +543,30 @@
                     🛍️ Start Shopping
                 </a>
 
-                <a href="${pageContext.request.contextPath}/buyer-dashboard"
-                   class="secondary-btn">
-                    👤 My Profile
-                </a>
+                <% if (isBuyer) { %>
+
+                    <a href="${pageContext.request.contextPath}/buyer-dashboard"
+                       class="secondary-btn">
+                        👤 My Dashboard
+                    </a>
+
+                <% } else if (isSeller) { %>
+
+                    <a href="${pageContext.request.contextPath}/seller-dashboard"
+                       class="secondary-btn">
+                        👤 My Dashboard
+                    </a>
+
+                <% } %>
 
             <% } else { %>
 
-                <a href="login.jsp"
+                <a href="${pageContext.request.contextPath}/login.jsp"
                    class="primary-btn">
                     🛍️ Start Shopping
                 </a>
 
-                <a href="register.jsp"
+                <a href="${pageContext.request.contextPath}/register.jsp"
                    class="secondary-btn">
                     Create Account
                 </a>
@@ -764,7 +759,7 @@
         fashion collections on Sri Shop.
     </p>
 
-    <a href="register.jsp">
+    <a href="${pageContext.request.contextPath}/register.jsp">
         Create Account
     </a>
 
