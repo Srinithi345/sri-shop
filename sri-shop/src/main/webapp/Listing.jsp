@@ -43,7 +43,7 @@
             color: #222;
         }
 
-        /* NAVBAR */
+        /* ================= NAVBAR ================= */
 
         .navbar {
             background: #111827;
@@ -82,7 +82,7 @@
             background: #dc2626;
         }
 
-        /* MAIN */
+        /* ================= MAIN ================= */
 
         .container {
             width: 90%;
@@ -104,7 +104,7 @@
             margin-top: 7px;
         }
 
-        /* PRODUCT GRID */
+        /* ================= PRODUCT GRID ================= */
 
         .product-grid {
             display: grid;
@@ -114,7 +114,7 @@
             gap: 25px;
         }
 
-        /* PRODUCT CARD */
+        /* ================= PRODUCT CARD ================= */
 
         .product-card {
             background: white;
@@ -134,7 +134,7 @@
                 0 8px 25px rgba(0, 0, 0, 0.14);
         }
 
-        /* IMAGE */
+        /* ================= IMAGE ================= */
 
         .product-image {
             width: 100%;
@@ -163,7 +163,7 @@
             font-size: 15px;
         }
 
-        /* PRODUCT INFO */
+        /* ================= PRODUCT INFO ================= */
 
         .product-info {
             padding: 18px;
@@ -172,14 +172,27 @@
         .product-name {
             font-size: 20px;
             font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        /* ================= PRODUCT COLOUR ================= */
+
+        .product-color {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 8px;
         }
+
+        /* ================= CATEGORY ================= */
 
         .category {
             color: #64748b;
             font-size: 14px;
             margin-bottom: 8px;
         }
+
+        /* ================= DESCRIPTION ================= */
 
         .description {
             color: #6b7280;
@@ -192,6 +205,8 @@
             margin-bottom: 12px;
         }
 
+        /* ================= PRICE ================= */
+
         .price {
             font-size: 21px;
             font-weight: bold;
@@ -200,6 +215,8 @@
 
             margin-bottom: 8px;
         }
+
+        /* ================= STOCK ================= */
 
         .stock {
             font-size: 14px;
@@ -214,7 +231,7 @@
             color: #dc2626;
         }
 
-        /* ACTION BUTTONS */
+        /* ================= ACTION BUTTONS ================= */
 
         .product-actions {
             display: flex;
@@ -245,6 +262,8 @@
             font-size: 14px;
         }
 
+        /* VIEW PRODUCT */
+
         .details-btn {
             background: #0f766e;
             color: white;
@@ -253,6 +272,8 @@
         .details-btn:hover {
             background: #115e59;
         }
+
+        /* WISHLIST */
 
         .wishlist-btn {
             background: #fff1f2;
@@ -264,7 +285,7 @@
             background: #ffe4e6;
         }
 
-        /* EMPTY */
+        /* ================= EMPTY ================= */
 
         .empty {
             text-align: center;
@@ -278,7 +299,7 @@
             color: #64748b;
         }
 
-        /* MOBILE */
+        /* ================= MOBILE ================= */
 
         @media (max-width: 600px) {
 
@@ -305,7 +326,6 @@
     </style>
 
 </head>
-
 
 <body>
 
@@ -344,7 +364,6 @@
 
 </nav>
 
-
 <!-- ================= MAIN ================= -->
 
 <div class="container">
@@ -360,7 +379,6 @@
         </p>
 
     </div>
-
 
     <!-- ================= NO PRODUCTS ================= -->
 
@@ -378,13 +396,11 @@
 
         </div>
 
-
-    <!-- ================= PRODUCTS ================= -->
-
     <% } else { %>
 
-        <div class="product-grid">
+        <!-- ================= PRODUCT GRID ================= -->
 
+        <div class="product-grid">
 
             <% for (Product product : products) {
 
@@ -406,8 +422,7 @@
                     imageUrl.startsWith("/sri-shop/")
                 ) {
 
-                    // Already has application path.
-                    imageUrl = imageUrl;
+                    // Already contains application path.
 
                 } else if (
                     imageUrl.startsWith("/")
@@ -423,11 +438,9 @@
 
             %>
 
-
             <!-- ================= PRODUCT CARD ================= -->
 
             <div class="product-card">
-
 
                 <!-- IMAGE -->
 
@@ -461,19 +474,35 @@
 
                 </div>
 
-
-                <!-- PRODUCT INFORMATION -->
+                <!-- ================= PRODUCT INFORMATION ================= -->
 
                 <div class="product-info">
 
-
-                    <!-- NAME -->
+                    <!-- DRESS NAME -->
 
                     <div class="product-name">
 
                         <%= product.getName() %>
 
                     </div>
+
+
+                    <!-- ================= PRODUCT COLOUR ================= -->
+
+                    <%
+                        String productColor = product.getColor();
+                    %>
+
+                    <% if (productColor != null &&
+                           !productColor.trim().isEmpty()) { %>
+
+                        <div class="product-color">
+
+                            <%= productColor %>
+
+                        </div>
+
+                    <% } %>
 
 
                     <!-- CATEGORY -->
@@ -528,11 +557,11 @@
                     <% } %>
 
 
-                    <!-- ACTION BUTTONS -->
+                    <!-- ================= ACTION BUTTONS ================= -->
 
                     <div class="product-actions">
 
-                        <!-- WISHLIST -->
+                        <!-- ADD TO WISHLIST -->
 
                         <form
                             action="<%= contextPath %>/wishlist"
@@ -572,11 +601,9 @@
 
                     </div>
 
-
                 </div>
 
             </div>
-
 
             <% } %>
 
