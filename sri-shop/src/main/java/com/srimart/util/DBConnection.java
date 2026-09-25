@@ -12,19 +12,34 @@ public final class DBConnection {
     private static final String USER =
             "postgres";
 
+    /*
+     * PostgreSQL password is read from the
+     * SRIMART_DB_PASSWORD environment variable.
+     *
+     * Do NOT put the real password directly in this file.
+     */
     private static final String PASSWORD =
-            "Kamaraj";
+            System.getenv("SRIMART_DB_PASSWORD");
 
     private DBConnection() {
     }
 
     public static Connection getConnection() throws SQLException {
 
+        if (PASSWORD == null || PASSWORD.isBlank()) {
+            throw new SQLException(
+                    "Database password is not configured. " +
+                    "Please set the SRIMART_DB_PASSWORD environment variable."
+            );
+        }
+
         try {
             Class.forName("org.postgresql.Driver");
+
         } catch (ClassNotFoundException e) {
+
             throw new SQLException(
-                    "PostgreSQL JDBC Driver not found",
+                    "PostgreSQL JDBC Driver not found.",
                     e
             );
         }
@@ -34,5 +49,14 @@ public final class DBConnection {
                 USER,
                 PASSWORD
         );
+    }
+
+    public static void close() {
+        /*
+         * No connection pool to close.
+         *
+         * Each DAO class uses try-with-resources,
+         * so database connections are closed automatically.
+         */
     }
 }

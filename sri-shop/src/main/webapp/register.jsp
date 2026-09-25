@@ -1,15 +1,17 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Sri Shop - Create Account</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -19,6 +21,7 @@
             min-height: 100vh;
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #0f766e, #134e4a);
+
             display: flex;
             justify-content: center;
             align-items: center;
@@ -29,7 +32,9 @@
             background: white;
             padding: 35px;
             border-radius: 18px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+
+            box-shadow:
+                0 15px 40px rgba(0, 0, 0, 0.25);
         }
 
         h1 {
@@ -48,6 +53,7 @@
             display: block;
             margin-top: 15px;
             margin-bottom: 6px;
+
             font-weight: bold;
             color: #333;
         }
@@ -56,8 +62,10 @@
         select {
             width: 100%;
             padding: 12px;
+
             border: 1px solid #ccc;
             border-radius: 8px;
+
             font-size: 15px;
         }
 
@@ -69,14 +77,19 @@
 
         button {
             width: 100%;
+
             margin-top: 25px;
             padding: 13px;
+
             border: none;
             border-radius: 8px;
+
             background: #0f766e;
             color: white;
+
             font-size: 16px;
             font-weight: bold;
+
             cursor: pointer;
         }
 
@@ -113,7 +126,9 @@
             margin-bottom: 15px;
             font-weight: bold;
         }
+
     </style>
+
 </head>
 
 <body>
@@ -126,9 +141,11 @@
         Join Sri Shop
     </p>
 
+
+    <!-- Error Message -->
+
     <%
         String error = request.getParameter("error");
-        String success = request.getParameter("success");
 
         if (error != null && !error.isEmpty()) {
     %>
@@ -139,6 +156,13 @@
 
     <%
         }
+    %>
+
+
+    <!-- Success Message -->
+
+    <%
+        String success = request.getParameter("success");
 
         if (success != null && !success.isEmpty()) {
     %>
@@ -151,58 +175,109 @@
         }
     %>
 
+
+    <!-- Registration Form -->
+
     <form action="${pageContext.request.contextPath}/register"
           method="post">
 
-        <label for="name">Full Name</label>
 
-        <input type="text"
-               id="name"
-               name="name"
-               placeholder="Enter your name"
-               required>
+        <!-- Name -->
 
-        <label for="email">Email</label>
+        <label for="name">
+            Full Name
+        </label>
 
-        <input type="email"
-               id="email"
-               name="email"
-               placeholder="Enter your email"
-               required>
+        <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter your name"
+            minlength="2"
+            maxlength="100"
+            required>
 
-        <label for="phone">Phone</label>
 
-        <input type="tel"
-               id="phone"
-               name="phone"
-               placeholder="Enter your phone number">
+        <!-- Email -->
 
-        <label for="password">Password</label>
+        <label for="email">
+            Email
+        </label>
 
-        <input type="password"
-               id="password"
-               name="password"
-               placeholder="Enter password"
-               minlength="8"
-               required>
+        <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email"
+            required>
 
-        <label for="role">Account Type</label>
 
-        <select id="role"
-                name="role"
-                required>
+        <!-- Phone -->
 
-            <option value="">Select account type</option>
-            <option value="BUYER">Buyer</option>
-            <option value="SELLER">Seller</option>
+        <label for="phone">
+            Phone
+        </label>
+
+        <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="Enter your phone number"
+            pattern="[0-9]{10,15}">
+
+
+        <!-- Password -->
+
+        <label for="password">
+            Password
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            minlength="8"
+            maxlength="100"
+            required>
+
+
+        <!-- Role -->
+
+        <label for="role">
+            Account Type
+        </label>
+
+        <select
+            id="role"
+            name="role"
+            required>
+
+            <option value="">
+                Select account type
+            </option>
+
+            <option value="BUYER">
+                Buyer
+            </option>
+
+            <option value="SELLER">
+                Seller
+            </option>
 
         </select>
+
+
+        <!-- Submit -->
 
         <button type="submit">
             Create Account
         </button>
 
     </form>
+
+
+    <!-- Login -->
 
     <div class="login-link">
 

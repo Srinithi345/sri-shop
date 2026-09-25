@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "RegisterServlet", urlPatterns = {"/register"})
+@WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
     private RegisterService registerService;
@@ -34,35 +34,22 @@ public class RegisterServlet extends HttpServlet {
         String role = request.getParameter("role");
         String phone = request.getParameter("phone");
 
-        // Basic validation
-        if (name == null || name.trim().isEmpty()
-                || email == null || email.trim().isEmpty()
-                || password == null || password.trim().isEmpty()
-                || role == null || role.trim().isEmpty()) {
-
-            response.sendRedirect(
-                    request.getContextPath()
-                            + "/register.jsp?error=Please+fill+all+required+fields"
-            );
-            return;
-        }
-
         try {
 
             String result = registerService.register(
-                    name.trim(),
-                    email.trim(),
+                    name,
+                    email,
                     password,
-                    role.trim().toUpperCase(),
-                    phone != null ? phone.trim() : ""
+                    role,
+                    phone
             );
 
-            if (result != null
-                    && result.toLowerCase().contains("success")) {
+            if ("Registration successful".equals(result)) {
 
                 response.sendRedirect(
                         request.getContextPath()
-                                + "/login.jsp?success=Account+created+successfully"
+                                + "/register.jsp?success="
+                                + "Registration successful"
                 );
 
             } else {
@@ -70,10 +57,7 @@ public class RegisterServlet extends HttpServlet {
                 response.sendRedirect(
                         request.getContextPath()
                                 + "/register.jsp?error="
-                                + java.net.URLEncoder.encode(
-                                        result != null ? result : "Registration failed",
-                                        "UTF-8"
-                                )
+                                + result.replace(" ", "+")
                 );
             }
 
@@ -83,7 +67,8 @@ public class RegisterServlet extends HttpServlet {
 
             response.sendRedirect(
                     request.getContextPath()
-                            + "/register.jsp?error=Registration+failed"
+                            + "/register.jsp?error="
+                            + "Registration failed"
             );
         }
     }

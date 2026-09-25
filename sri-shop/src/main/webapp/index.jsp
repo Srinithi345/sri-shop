@@ -1,13 +1,22 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+
+<%
+    String userName = (String) session.getAttribute("userName");
+    String userRole = (String) session.getAttribute("userRole");
+    boolean loggedIn = userName != null && userRole != null;
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sri Shop | Online Dress Store</title>
+    <title>SRI SHOP | Fashion Marketplace</title>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -20,10 +29,11 @@
             color: #172033;
         }
 
-        /* NAVBAR */
+        /* ================= NAVBAR ================= */
+
         .navbar {
             width: 100%;
-            padding: 18px 7%;
+            padding: 17px 7%;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -31,13 +41,14 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .logo {
             font-size: 28px;
             font-weight: bold;
             color: #182b49;
+            text-decoration: none;
         }
 
         .logo span {
@@ -46,7 +57,7 @@
 
         .nav-links {
             display: flex;
-            gap: 28px;
+            gap: 26px;
             align-items: center;
         }
 
@@ -54,23 +65,36 @@
             text-decoration: none;
             color: #333;
             font-weight: 600;
+            transition: 0.2s;
         }
 
         .nav-links a:hover {
             color: #d89b35;
         }
 
+        .nav-icon {
+            font-size: 18px;
+        }
+
         .nav-btn {
-            padding: 11px 20px;
+            padding: 10px 20px;
             border-radius: 25px;
             background: #182b49;
             color: white !important;
         }
 
-        /* HERO */
+        .profile-btn {
+            padding: 9px 15px;
+            border-radius: 20px;
+            background: #f1f4f8;
+            color: #182b49 !important;
+        }
+
+        /* ================= HERO ================= */
+
         .hero {
-            min-height: 600px;
-            padding: 80px 7%;
+            min-height: 570px;
+            padding: 70px 7%;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -79,7 +103,7 @@
         }
 
         .hero-content {
-            max-width: 600px;
+            max-width: 620px;
         }
 
         .tag {
@@ -107,8 +131,47 @@
             font-size: 18px;
             line-height: 1.7;
             color: #5d6573;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
+
+        /* ================= SEARCH ================= */
+
+        .search-box {
+            width: 100%;
+            max-width: 570px;
+            display: flex;
+            background: white;
+            border: 1px solid #e1e5eb;
+            border-radius: 35px;
+            padding: 6px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            margin-bottom: 28px;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 13px 18px;
+            font-size: 15px;
+            background: transparent;
+        }
+
+        .search-box button {
+            border: none;
+            background: #182b49;
+            color: white;
+            padding: 12px 23px;
+            border-radius: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background: #d89b35;
+        }
+
+        /* ================= BUTTONS ================= */
 
         .hero-buttons {
             display: flex;
@@ -129,11 +192,22 @@
             color: white;
         }
 
+        .primary-btn:hover {
+            background: #d89b35;
+        }
+
         .secondary-btn {
             border: 2px solid #182b49;
             color: #182b49;
             background: white;
         }
+
+        .secondary-btn:hover {
+            background: #182b49;
+            color: white;
+        }
+
+        /* ================= HERO CARD ================= */
 
         .hero-card {
             width: 400px;
@@ -161,7 +235,8 @@
             color: #e6ebf2;
         }
 
-        /* FEATURES */
+        /* ================= SECTION ================= */
+
         .section {
             padding: 75px 7%;
         }
@@ -180,6 +255,45 @@
         .section-title p {
             color: #687080;
         }
+
+        /* ================= CATEGORIES ================= */
+
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category {
+            padding: 35px 20px;
+            background: white;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #e6e9ef;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .category:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+        }
+
+        .category-icon {
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+
+        .category h3 {
+            margin-bottom: 8px;
+            color: #182b49;
+        }
+
+        .category p {
+            color: #777;
+        }
+
+        /* ================= FEATURES ================= */
 
         .features {
             display: grid;
@@ -210,37 +324,8 @@
             line-height: 1.6;
         }
 
-        /* CATEGORY */
-        .categories {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
+        /* ================= CTA ================= */
 
-        .category {
-            padding: 35px 20px;
-            background: white;
-            border-radius: 15px;
-            text-align: center;
-            border: 1px solid #e6e9ef;
-            transition: 0.3s;
-        }
-
-        .category:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
-        }
-
-        .category h3 {
-            margin-bottom: 8px;
-            color: #182b49;
-        }
-
-        .category p {
-            color: #777;
-        }
-
-        /* CTA */
         .cta {
             margin: 20px 7% 70px;
             padding: 60px;
@@ -270,7 +355,8 @@
             font-weight: bold;
         }
 
-        /* FOOTER */
+        /* ================= FOOTER ================= */
+
         footer {
             background: #101b2d;
             color: white;
@@ -282,12 +368,30 @@
             color: #c5ccd7;
         }
 
-        /* RESPONSIVE */
+        /* ================= RESPONSIVE ================= */
+
         @media (max-width: 900px) {
+
+            .navbar {
+                padding: 15px 5%;
+            }
+
+            .nav-links {
+                gap: 12px;
+            }
 
             .hero {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .hero-content {
+                max-width: 700px;
+            }
+
+            .search-box {
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .hero-buttons {
@@ -306,16 +410,36 @@
             .categories {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .nav-links {
-                display: none;
-            }
         }
 
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 14px 4%;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .nav-links a {
+                font-size: 13px;
+            }
+
+            .nav-links {
+                gap: 8px;
+            }
+
+            .hero {
+                padding: 55px 5%;
+            }
 
             .hero h1 {
                 font-size: 40px;
+            }
+
+            .hero p {
+                font-size: 16px;
             }
 
             .categories {
@@ -330,38 +454,69 @@
                 font-size: 28px;
             }
         }
+
     </style>
+
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- ================= NAVBAR ================= -->
+
 <header class="navbar">
 
-    <div class="logo">
+    <a href="${pageContext.request.contextPath}/" class="logo">
         SRI <span>SHOP</span>
-    </div>
+    </a>
 
     <nav class="nav-links">
-        <a href="#home">Home</a>
-        <a href="#categories">Categories</a>
-        <a href="#features">Features</a>
-        <a href="#seller">Seller</a>
 
-        <!-- LOGIN -->
-        <a href="login.jsp" class="nav-btn">Login</a>
+        <% if (loggedIn) { %>
+
+            <a href="${pageContext.request.contextPath}/products">
+                👜 Accessories
+            </a>
+
+            <a href="${pageContext.request.contextPath}/wishlist">
+                ❤️ Wishlist
+            </a>
+
+            <a href="${pageContext.request.contextPath}/cart">
+                🛒 Cart
+            </a>
+
+            <a href="${pageContext.request.contextPath}/buyer-dashboard"
+               class="profile-btn">
+                👤 <%= userName %>
+            </a>
+
+        <% } else { %>
+
+            <a href="#home">Home</a>
+
+            <a href="#categories">
+                Categories
+            </a>
+
+            <a href="login.jsp" class="nav-btn">
+                Login
+            </a>
+
+        <% } %>
+
     </nav>
 
 </header>
 
 
-<!-- HERO / WELCOME -->
+<!-- ================= HERO ================= -->
+
 <section class="hero" id="home">
 
     <div class="hero-content">
 
         <div class="tag">
-            ✨ Premium Dress Collection
+            ✨ Premium Fashion Collection
         </div>
 
         <h1>
@@ -371,31 +526,70 @@
 
         <p>
             Welcome to Sri Shop — your trusted online destination
-            for stylish dresses, quality products and a simple
+            for stylish fashion, quality products and a simple
             shopping experience.
         </p>
 
+
+        <!-- SEARCH -->
+
+        <form class="search-box"
+              action="${pageContext.request.contextPath}/products"
+              method="get">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="🔍 Search dresses, shirts, shoes..."
+                autocomplete="off">
+
+            <button type="submit">
+                Search
+            </button>
+
+        </form>
+
+
         <div class="hero-buttons">
 
-            <!-- CHANGED: NOW GOES TO LOGIN -->
-            <a href="login.jsp" class="primary-btn">
-                Start Shopping
-            </a>
+            <% if (loggedIn) { %>
 
-            <a href="register.jsp" class="secondary-btn">
-                Create Account
-            </a>
+                <a href="${pageContext.request.contextPath}/products"
+                   class="primary-btn">
+                    🛍️ Start Shopping
+                </a>
+
+                <a href="${pageContext.request.contextPath}/buyer-dashboard"
+                   class="secondary-btn">
+                    👤 My Profile
+                </a>
+
+            <% } else { %>
+
+                <a href="login.jsp"
+                   class="primary-btn">
+                    🛍️ Start Shopping
+                </a>
+
+                <a href="register.jsp"
+                   class="secondary-btn">
+                    Create Account
+                </a>
+
+            <% } %>
 
         </div>
 
     </div>
 
 
+    <!-- HERO CARD -->
+
     <div class="hero-card">
 
         <div class="hero-card-content">
 
-            <h2>Sri</h2>
+            <h2>SRI</h2>
 
             <p>
                 Fashion • Quality • Comfort
@@ -404,8 +598,8 @@
             <br>
 
             <p>
-                Shop your favourite dresses
-                from Sri Shop.
+                Fashion for Women, Men & Kids.
+                Find your perfect style at Sri Shop.
             </p>
 
         </div>
@@ -415,8 +609,82 @@
 </section>
 
 
-<!-- FEATURES -->
-<section class="section" id="features">
+<!-- ================= CATEGORIES ================= -->
+
+<section class="section" id="categories">
+
+    <div class="section-title">
+
+        <h2>Shop By Category</h2>
+
+        <p>
+            Explore fashion collections for everyone.
+        </p>
+
+    </div>
+
+
+    <div class="categories">
+
+        <div class="category">
+
+            <div class="category-icon">👗</div>
+
+            <h3>Women</h3>
+
+            <p>
+                Dresses, sarees, kurtis & more
+            </p>
+
+        </div>
+
+
+        <div class="category">
+
+            <div class="category-icon">👔</div>
+
+            <h3>Men</h3>
+
+            <p>
+                Shirts, T-shirts, jeans & more
+            </p>
+
+        </div>
+
+
+        <div class="category">
+
+            <div class="category-icon">🧒</div>
+
+            <h3>Kids</h3>
+
+            <p>
+                Boys & girls fashion collections
+            </p>
+
+        </div>
+
+
+        <div class="category">
+
+            <div class="category-icon">👟</div>
+
+            <h3>Footwear</h3>
+
+            <p>
+                Shoes, sneakers & sandals
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section class="section">
 
     <div class="section-title">
 
@@ -433,12 +701,14 @@
 
         <div class="feature-card">
 
-            <div class="feature-icon">🛍️</div>
+            <div class="feature-icon">
+                🛍️
+            </div>
 
             <h3>Easy Shopping</h3>
 
             <p>
-                Browse products, search by category,
+                Browse products, search products,
                 add items to cart and place orders easily.
             </p>
 
@@ -447,13 +717,15 @@
 
         <div class="feature-card">
 
-            <div class="feature-icon">🔐</div>
+            <div class="feature-icon">
+                ❤️
+            </div>
 
-            <h3>Secure Account</h3>
+            <h3>Wishlist</h3>
 
             <p>
-                Separate Buyer and Seller accounts
-                with secure authentication.
+                Save your favourite products and
+                access them anytime from your wishlist.
             </p>
 
         </div>
@@ -461,13 +733,15 @@
 
         <div class="feature-card">
 
-            <div class="feature-icon">🚚</div>
+            <div class="feature-icon">
+                ⭐
+            </div>
 
-            <h3>Order Management</h3>
+            <h3>Reviews & Ratings</h3>
 
             <p>
-                Track your orders and manage your
-                shopping activities from your dashboard.
+                View customer ratings and reviews
+                for every product.
             </p>
 
         </div>
@@ -477,72 +751,38 @@
 </section>
 
 
-<!-- CATEGORIES -->
-<section class="section" id="categories">
+<!-- ================= CTA ================= -->
 
-    <div class="section-title">
+<% if (!loggedIn) { %>
 
-        <h2>Shop By Category</h2>
+<section class="cta">
 
-        <p>
-            Explore our dress collections.
-        </p>
-
-    </div>
-
-
-    <div class="categories">
-
-        <div class="category">
-            <h3>👗 Dresses</h3>
-            <p>Stylish dress collections</p>
-        </div>
-
-        <div class="category">
-            <h3>🌸 Casual Wear</h3>
-            <p>Comfortable everyday styles</p>
-        </div>
-
-        <div class="category">
-            <h3>✨ Party Wear</h3>
-            <p>Special occasion collections</p>
-        </div>
-
-        <div class="category">
-            <h3>💫 New Arrivals</h3>
-            <p>Latest fashion collections</p>
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- SELLER -->
-<section class="cta" id="seller">
-
-    <h2>Are You a Seller?</h2>
+    <h2>Ready to Start Shopping?</h2>
 
     <p>
-        Register as a Seller and start managing
-        your own product listings on Sri Shop.
+        Create your account and explore the latest
+        fashion collections on Sri Shop.
     </p>
 
     <a href="register.jsp">
-        Become a Seller
+        Create Account
     </a>
 
 </section>
 
+<% } %>
 
-<!-- FOOTER -->
+
+<!-- ================= FOOTER ================= -->
+
 <footer>
 
     <p>
-        © 2026 Sri Shop. All Rights Reserved.
+        © 2026 SRI SHOP. All Rights Reserved.
     </p>
 
 </footer>
+
 
 </body>
 </html>
