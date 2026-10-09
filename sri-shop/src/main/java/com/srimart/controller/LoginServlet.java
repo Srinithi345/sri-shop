@@ -22,7 +22,6 @@ public class LoginServlet extends HttpServlet {
         loginService = new LoginService();
     }
 
-    // If /login is opened directly
     @Override
     protected void doGet(
             HttpServletRequest request,
@@ -45,7 +44,6 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        // Validation
         if (email == null || email.trim().isEmpty()
                 || password == null || password.trim().isEmpty()) {
 
@@ -63,7 +61,6 @@ public class LoginServlet extends HttpServlet {
                     password
             );
 
-            // Invalid login
             if (user == null) {
 
                 response.sendRedirect(
@@ -73,7 +70,6 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            // Create session
             HttpSession session = request.getSession(true);
 
             session.setAttribute("userId", user.getUserId());
@@ -81,12 +77,11 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userEmail", user.getEmail());
             session.setAttribute("userRole", user.getRole());
 
-            // Role based dashboard
             if ("SELLER".equalsIgnoreCase(user.getRole())) {
 
                 response.sendRedirect(
                         request.getContextPath()
-                                + "/seller-dashboard.jsp"
+                                + "/seller-dashboard"
                 );
 
             } else {

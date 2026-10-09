@@ -11,7 +11,8 @@
         !"SELLER".equalsIgnoreCase(userRole)) {
 
         response.sendRedirect(
-                request.getContextPath() + "/login.jsp");
+                request.getContextPath() + "/login.jsp"
+        );
 
         return;
     }
@@ -34,21 +35,26 @@
             (java.util.List<com.srimart.model.Product>)
                     request.getAttribute("sellerProducts");
 
-    if (totalProducts == null)
+    if (totalProducts == null) {
         totalProducts = 0;
+    }
 
-    if (totalOrders == null)
+    if (totalOrders == null) {
         totalOrders = 0;
+    }
 
-    if (lowStock == null)
+    if (lowStock == null) {
         lowStock = 0;
+    }
 
-    if (totalSales == null)
+    if (totalSales == null) {
         totalSales = java.math.BigDecimal.ZERO;
+    }
 
-    if (sellerProducts == null)
+    if (sellerProducts == null) {
         sellerProducts =
                 new java.util.ArrayList<>();
+    }
 %>
 
 <!DOCTYPE html>
@@ -292,8 +298,6 @@ body {
     font-weight: bold;
 }
 
-/* EDIT BUTTON */
-
 .edit-btn {
     display: inline-block;
     background: #2563eb;
@@ -313,30 +317,6 @@ body {
     text-align: center;
     color: #64748b;
     padding: 30px;
-}
-
-.innovation {
-    margin-top: 30px;
-    background: white;
-    padding: 28px;
-    border-radius: 18px;
-
-    box-shadow:
-        0 8px 25px
-        rgba(0,0,0,0.07);
-
-    border-left:
-        5px solid #0f766e;
-}
-
-.innovation h2 {
-    margin-top: 0;
-    color: #0f766e;
-}
-
-.innovation p {
-    color: #64748b;
-    line-height: 1.6;
 }
 
 @media (max-width: 900px) {
@@ -522,7 +502,6 @@ body {
 
     <div class="cards">
 
-
         <div class="card">
 
             <div class="icon">
@@ -589,7 +568,7 @@ body {
             </p>
 
             <a class="btn"
-               href="#orders">
+               href="${pageContext.request.contextPath}/seller-orders">
 
                 View Orders
 
@@ -614,7 +593,7 @@ body {
             </p>
 
             <a class="btn"
-               href="#products">
+               href="${pageContext.request.contextPath}/seller-inventory">
 
                 Manage Stock
 
@@ -639,7 +618,7 @@ body {
             </p>
 
             <a class="btn"
-               href="#reviews">
+               href="${pageContext.request.contextPath}/seller-reviews">
 
                 View Reviews
 
@@ -664,7 +643,7 @@ body {
             </p>
 
             <a class="btn"
-               href="#analytics">
+               href="${pageContext.request.contextPath}/seller-analytics">
 
                 View Analytics
 
@@ -694,23 +673,16 @@ body {
                 <tr>
 
                     <th>ID</th>
-
                     <th>Product</th>
-
                     <th>Category</th>
-
                     <th>Price</th>
-
                     <th>Color</th>
-
                     <th>Stock</th>
-
                     <th>Action</th>
 
                 </tr>
 
             </thead>
-
 
             <tbody>
 
@@ -727,30 +699,23 @@ body {
                         <%= product.getProductId() %>
                     </td>
 
-
                     <td>
-
                         <strong>
                             <%= product.getName() %>
                         </strong>
-
                     </td>
-
 
                     <td>
                         <%= product.getCategory() %>
                     </td>
 
-
                     <td>
                         ₹<%= product.getPrice() %>
                     </td>
 
-
                     <td>
                         <%= product.getColor() %>
                     </td>
-
 
                     <td>
 
@@ -787,7 +752,6 @@ body {
                         %>
 
                     </td>
-
 
                     <td>
 
@@ -841,23 +805,6 @@ body {
             }
 
         %>
-
-    </div>
-
-
-    <div class="innovation">
-
-        <h2>
-            👗 SRI SHOP Innovation
-        </h2>
-
-        <p>
-            Our Virtual Trial Room allows buyers
-            to preview selected dresses before
-            purchasing. Sellers can upload dress
-            images that can be used in the virtual
-            trial experience.
-        </p>
 
     </div>
 

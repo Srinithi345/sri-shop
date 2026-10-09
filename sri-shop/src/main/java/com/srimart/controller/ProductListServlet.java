@@ -39,10 +39,20 @@ public class ProductListServlet extends HttpServlet {
         try {
 
             String searchTerm = request.getParameter("search");
+            String category = request.getParameter("category");
 
             List<Product> products;
 
-            if (searchTerm != null
+            if (category != null && !category.trim().isEmpty()) {
+
+                products = productDAO.getProductsByCategory(category);
+
+                request.setAttribute(
+                        "category",
+                        category.trim()
+                );
+
+            } else if (searchTerm != null
                     && !searchTerm.trim().isEmpty()) {
 
                 products = productDAO.searchProducts(searchTerm);

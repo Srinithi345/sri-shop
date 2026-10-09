@@ -1,5 +1,6 @@
 package com.srimart.model;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 public class Wishlist {
@@ -9,10 +10,15 @@ public class Wishlist {
     private int productId;
     private Timestamp createdAt;
 
+    private String productName;
+    private BigDecimal productPrice;
+    private String productImage;
+
     public Wishlist() {
     }
 
-    public Wishlist(int wishlistId, int buyerId, int productId, Timestamp createdAt) {
+    public Wishlist(int wishlistId, int buyerId, int productId,
+                    Timestamp createdAt) {
         this.wishlistId = wishlistId;
         this.buyerId = buyerId;
         this.productId = productId;
@@ -54,5 +60,29 @@ public class Wishlist {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public BigDecimal getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(BigDecimal productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public String getProductImage() {
+        return productImage;
+    }
+
+    public void setProductImage(String productImage) {
+        this.productImage = productImage;
     }
 }

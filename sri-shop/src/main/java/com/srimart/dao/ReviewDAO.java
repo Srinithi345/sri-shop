@@ -92,4 +92,36 @@ public class ReviewDAO {
             statement.executeUpdate();
         }
     }
+
+    public ResultSet getReviewsBySeller(long sellerId)
+            throws Exception {
+
+        String sql =
+                "SELECT " +
+                "r.review_id, " +
+                "r.rating, " +
+                "r.comment, " +
+                "r.created_at, " +
+                "p.product_id, " +
+                "p.name AS product_name, " +
+                "u.name AS buyer_name, " +
+                "u.email AS buyer_email " +
+                "FROM reviews r " +
+                "JOIN products p " +
+                "ON r.product_id = p.product_id " +
+                "JOIN users u " +
+                "ON r.buyer_id = u.user_id " +
+                "WHERE p.seller_id = ? " +
+                "ORDER BY r.created_at DESC";
+
+        Connection connection =
+                DBConnection.getConnection();
+
+        PreparedStatement statement =
+                connection.prepareStatement(sql);
+
+        statement.setLong(1, sellerId);
+
+        return statement.executeQuery();
+    }
 }

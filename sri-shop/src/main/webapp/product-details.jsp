@@ -2,22 +2,53 @@
 <%@ page import="com.srimart.model.Product" %>
 
 <%
+    String contextPath = request.getContextPath();
+
     Product product = (Product) request.getAttribute("product");
 
     if (product == null) {
-        response.sendRedirect(request.getContextPath() + "/products");
+        response.sendRedirect(contextPath + "/products");
         return;
     }
+
+    String imageUrl = product.getImageUrl();
+
+    if (imageUrl != null) {
+        imageUrl = imageUrl.trim();
+
+        if (!imageUrl.startsWith("http://")
+                && !imageUrl.startsWith("https://")
+                && !imageUrl.startsWith("/")) {
+            imageUrl = contextPath + "/" + imageUrl;
+        }
+    }
+
+    String imageSrc = imageUrl;
+
+    if (imageUrl != null && !imageUrl.isEmpty()) {
+        if (imageUrl.contains("?")) {
+            imageSrc = imageUrl + "&v=" + product.getProductId();
+        } else {
+            imageSrc = imageUrl + "?v=" + product.getProductId();
+        }
+    }
+
+    int stockQuantity = product.getStockQuantity();
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
 
-    <title><%= product.getName() %> - SRI SHOP</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        <%= product.getName() %> - SRI SHOP
+    </title>
 
     <style>
 
@@ -28,652 +59,447 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f0fdfa;
-            color: #134e4a;
+            background: #f8fafc;
+            color: #1f2937;
         }
 
-        /* ================= HEADER ================= */
-
-        .header {
+        header {
             background: #0f766e;
             color: white;
-            padding: 20px 40px;
+            padding: 16px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .header h1 {
-            margin: 0;
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
         }
 
-        .back {
-            background: white;
-            color: #0f766e;
-            padding: 10px 18px;
+        nav {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 9px 12px;
             border-radius: 8px;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            background: #115e59;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 18px;
+        }
+
+        .breadcrumb a {
+            color: #0f766e;
             text-decoration: none;
             font-weight: bold;
         }
 
-        .back:hover {
-            background: #f0fdfa;
+        .breadcrumb span {
+            margin: 0 7px;
+            color: #94a3b8;
         }
 
-        /* ================= CONTAINER ================= */
-
-        .container {
-            max-width: 1100px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-
-        .product-box {
+        .product-card {
             background: white;
-            border-radius: 20px;
-            padding: 35px;
+            border-radius: 18px;
+            padding: 30px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 45px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            gap: 40px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         }
 
-        /* ================= PRODUCT IMAGE ================= */
-
-        .product-image {
+        .image-box {
             height: 500px;
+            background: #f8fafc;
             border-radius: 15px;
-            background: #f5f5f5;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
 
-        .product-image img {
+        .image-box img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
+            display: block;
         }
 
-        /* ================= DETAILS ================= */
+        .no-image {
+            color: #64748b;
+            font-size: 18px;
+        }
 
-        .details h2 {
-            font-size: 32px;
-            margin-top: 0;
+        .category {
+            display: inline-block;
+            background: #ccfbf1;
             color: #0f766e;
+            font-weight: bold;
+            padding: 7px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        h1 {
+            margin: 0 0 15px;
+            font-size: 34px;
+            color: #111827;
         }
 
         .description {
-            color: #666;
+            color: #64748b;
             line-height: 1.7;
-        }
-
-        .info {
-            margin-top: 20px;
-        }
-
-        .info p {
-            margin: 12px 0;
-            font-size: 16px;
+            margin-bottom: 20px;
         }
 
         .price {
             font-size: 30px;
             font-weight: bold;
             color: #0f766e;
-            margin: 25px 0;
+            margin-bottom: 18px;
         }
 
         .stock {
             font-weight: bold;
+            margin-bottom: 20px;
         }
 
-        /* ================= SIZE / COLOR ================= */
+        .available {
+            color: #15803d;
+        }
 
-        .option-group {
-            margin-top: 24px;
+        .out {
+            color: #dc2626;
         }
 
         .option-title {
-            display: block;
             font-weight: bold;
-            margin-bottom: 12px;
-            font-size: 16px;
+            margin: 18px 0 8px;
         }
 
-        .options {
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #0f766e;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+
+        .quantity {
+            max-width: 120px;
+        }
+
+        .buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin-top: 22px;
         }
 
-        .option input {
-            display: none;
-        }
-
-        .option span {
-            display: inline-block;
-            padding: 10px 20px;
-            border: 1px solid #cbd5d1;
-            border-radius: 8px;
-            cursor: pointer;
-            background: white;
-            color: #134e4a;
-            transition: 0.2s;
-        }
-
-        .option span:hover {
-            border-color: #0f766e;
-        }
-
-        .option input:checked + span {
-            background: #0f766e;
-            color: white;
-            border-color: #0f766e;
-        }
-
-        /* ================= QUANTITY ================= */
-
-        .quantity-section {
-            margin-top: 24px;
-        }
-
-        .quantity-section label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .quantity-input {
-            width: 90px;
-            padding: 10px;
-            border: 1px solid #cbd5d1;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        /* ================= MAIN BUTTONS ================= */
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        .cart-btn,
-        .buy-btn,
-        .try-btn {
-            padding: 14px 24px;
-            border-radius: 10px;
-            font-weight: bold;
+        button,
+        .buy-button {
             border: none;
-            cursor: pointer;
+            border-radius: 9px;
+            padding: 13px 18px;
             font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
             text-decoration: none;
             display: inline-block;
         }
 
-        .cart-btn {
+        .cart-button {
             background: #0f766e;
             color: white;
         }
 
-        .buy-btn {
-            background: #134e4a;
-            color: white;
-        }
-
-        .try-btn {
-            background: white;
-            color: #0f766e;
-            border: 2px solid #0f766e;
-        }
-
-        .cart-btn:hover {
+        .cart-button:hover {
             background: #115e59;
         }
 
-        .buy-btn:hover {
-            background: #0f766e;
+        .buy-button {
+            background: #f59e0b;
+            color: white;
         }
 
-        .try-btn:hover {
-            background: #f0fdfa;
+        .buy-button:hover {
+            background: #d97706;
         }
 
-        /* ================= WISHLIST / SHARE / REVIEWS ================= */
-
-        .secondary-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 15px;
-            flex-wrap: wrap;
+        .wishlist-button {
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
-        .wishlist-form {
-            margin: 0;
+        .wishlist-button:hover {
+            background: #fecaca;
         }
 
-        .wishlist-btn,
-        .share-btn,
-        .review-btn {
-            padding: 11px 18px;
-            border-radius: 8px;
+        .share-button {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .share-button:hover {
+            background: #cbd5e1;
+        }
+
+        .product-info-box {
+            margin-top: 25px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 10px;
             font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
+            color: #475569;
+        }
+
+        .product-info-box div {
+            margin: 8px 0;
+        }
+
+        .reviews {
             display: inline-block;
-        }
-
-        /* WISHLIST */
-
-        .wishlist-btn {
-            background: #fff1f2;
-            color: #be123c;
-            border: 1px solid #fecdd3;
-        }
-
-        .wishlist-btn:hover {
-            background: #ffe4e6;
-        }
-
-        /* SHARE */
-
-        .share-btn {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-
-        .share-btn:hover {
-            background: #dbeafe;
-        }
-
-        /* REVIEWS */
-
-        .review-btn {
-            background: #fffbeb;
-            color: #a16207;
-            border: 1px solid #fde68a;
-        }
-
-        .review-btn:hover {
-            background: #fef3c7;
-        }
-
-        /* SHARE MESSAGE */
-
-        .share-message {
-            display: none;
-            margin-top: 8px;
+            margin-top: 25px;
             color: #0f766e;
-            font-size: 14px;
             font-weight: bold;
+            text-decoration: none;
         }
 
-        /* ================= MOBILE ================= */
+        .reviews:hover {
+            text-decoration: underline;
+        }
 
-        @media (max-width: 700px) {
+        @media (max-width: 800px) {
 
-            .header {
-                padding: 18px 20px;
-            }
-
-            .product-box {
+            .product-card {
                 grid-template-columns: 1fr;
-                padding: 20px;
             }
 
-            .product-image {
+            .image-box {
                 height: 400px;
             }
 
-            .details h2 {
-                font-size: 26px;
+            h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            header {
+                padding: 14px;
             }
 
-            .actions,
-            .secondary-actions {
+            .container {
+                padding: 0 12px;
+                margin: 20px auto;
+            }
+
+            .product-card {
+                padding: 20px;
+            }
+
+            .buttons {
                 flex-direction: column;
             }
 
-            .cart-btn,
-            .buy-btn,
-            .try-btn,
-            .wishlist-btn,
-            .share-btn,
-            .review-btn {
+            button,
+            .buy-button {
                 width: 100%;
                 text-align: center;
             }
-
         }
 
     </style>
 
 </head>
 
-
 <body>
 
 
-<!-- ================= HEADER ================= -->
+<header>
 
-<div class="header">
+    <div class="logo">
+        &#128722; SRI SHOP
+    </div>
 
-    <h1>SRI SHOP</h1>
+    <nav>
 
-    <a
-        class="back"
-        href="${pageContext.request.contextPath}/products"
-    >
-        Back to Dresses
-    </a>
+        <a href="<%= contextPath %>/products">
+            &#128087; Shop
+        </a>
 
-</div>
+        <a href="<%= contextPath %>/products?category=Accessories">
+            &#128091; Accessories
+        </a>
 
+        <a href="<%= contextPath %>/wishlist">
+            &#10084;&#65039; Wishlist
+        </a>
 
+        <a href="<%= contextPath %>/cart">
+            &#128722; Cart
+        </a>
 
-<!-- ================= MAIN CONTAINER ================= -->
+        <a href="<%= contextPath %>/profile">
+            &#128100; Profile
+        </a>
+
+    </nav>
+
+</header>
+
 
 <div class="container">
 
-    <div class="product-box">
+
+    <!-- BREADCRUMB -->
+
+    <div class="breadcrumb">
+
+        <a href="<%= contextPath %>/products">
+            Shop
+        </a>
+
+        <span>&rsaquo;</span>
+
+        <a href="<%= contextPath %>/products?category=<%= product.getCategory() %>">
+            <%= product.getCategory() %>
+        </a>
+
+        <span>&rsaquo;</span>
+
+        <span>
+            <%= product.getName() %>
+        </span>
+
+    </div>
 
 
-        <!-- ================= PRODUCT IMAGE ================= -->
+    <div class="product-card">
 
-        <div class="product-image">
 
-            <% if (product.getImageUrl() != null
-                    && !product.getImageUrl().isBlank()) { %>
+        <!-- PRODUCT IMAGE -->
+
+        <div class="image-box">
+
+            <% if (imageSrc != null && !imageSrc.isEmpty()) { %>
 
                 <img
-                    src="<%= product.getImageUrl() %>"
+                    src="<%= imageSrc %>"
                     alt="<%= product.getName() %>"
+                    onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=&quot;no-image&quot;>Image unavailable</div>';"
                 >
 
             <% } else { %>
 
-                <span>No Image Available</span>
+                <div class="no-image">
+                    Image unavailable
+                </div>
 
             <% } %>
 
         </div>
 
 
+        <!-- PRODUCT DETAILS -->
 
-        <!-- ================= PRODUCT DETAILS ================= -->
+        <div>
 
-        <div class="details">
+            <div class="category">
+
+                <%= product.getCategory() %>
+
+            </div>
 
 
-            <!-- PRODUCT NAME -->
-
-            <h2>
+            <h1>
 
                 <%= product.getName() %>
 
-            </h2>
+            </h1>
 
 
-
-            <!-- DESCRIPTION -->
-
-            <p class="description">
+            <div class="description">
 
                 <%= product.getDescription() %>
 
-            </p>
-
-
-
-            <!-- PRODUCT INFORMATION -->
-
-            <div class="info">
-
-                <p>
-
-                    <strong>Category:</strong>
-
-                    <%= product.getCategory() %>
-
-                </p>
-
-
-                <p class="stock">
-
-                    <strong>Available Stock:</strong>
-
-                    <%= product.getStockQuantity() %>
-
-                </p>
-
             </div>
 
-
-
-            <!-- ================= SIZE ================= -->
-
-            <div class="option-group">
-
-                <span class="option-title">
-
-                    Size
-
-                </span>
-
-
-                <div class="options">
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="size"
-                            value="S"
-                            checked
-                        >
-
-                        <span>S</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="size"
-                            value="M"
-                        >
-
-                        <span>M</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="size"
-                            value="L"
-                        >
-
-                        <span>L</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="size"
-                            value="XL"
-                        >
-
-                        <span>XL</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="size"
-                            value="XXL"
-                        >
-
-                        <span>XXL</span>
-
-                    </label>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ================= COLOR ================= -->
-
-            <div class="option-group">
-
-                <span class="option-title">
-
-                    Color
-
-                </span>
-
-
-                <div class="options">
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="color"
-                            value="Black"
-                            checked
-                        >
-
-                        <span>Black</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="color"
-                            value="Blue"
-                        >
-
-                        <span>Blue</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="color"
-                            value="Pink"
-                        >
-
-                        <span>Pink</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="color"
-                            value="Green"
-                        >
-
-                        <span>Green</span>
-
-                    </label>
-
-
-                    <label class="option">
-
-                        <input
-                            type="radio"
-                            name="color"
-                            value="Red"
-                        >
-
-                        <span>Red</span>
-
-                    </label>
-
-
-                </div>
-
-            </div>
-
-
-
-            <!-- ================= QUANTITY ================= -->
-
-            <div class="quantity-section">
-
-                <label for="quantity">
-
-                    Quantity
-
-                </label>
-
-
-                <input
-                    class="quantity-input"
-                    type="number"
-                    id="quantity"
-                    name="quantity"
-                    value="1"
-                    min="1"
-                    max="<%= product.getStockQuantity() %>"
-                >
-
-            </div>
-
-
-
-            <!-- ================= PRICE ================= -->
 
             <div class="price">
 
-                ₹<%= product.getPrice() %>
+                &#8377;<%= product.getPrice() %>
 
             </div>
 
 
+            <!-- STOCK -->
 
-            <!-- ================= MAIN ACTIONS ================= -->
+            <div class="stock">
 
-            <div class="actions">
+                <% if (stockQuantity > 0) { %>
+
+                    <span class="available">
+
+                        &#10003; In Stock:
+                        <%= stockQuantity %>
+
+                    </span>
+
+                <% } else { %>
+
+                    <span class="out">
+
+                        Out of Stock
+
+                    </span>
+
+                <% } %>
+
+            </div>
 
 
-                <!-- ADD TO CART -->
+            <% if (stockQuantity > 0) { %>
+
+
+                <!-- ADD TO CART FORM -->
 
                 <form
                     method="post"
-                    action="${pageContext.request.contextPath}/cart"
-                    onsubmit="return prepareCartData();"
+                    action="<%= contextPath %>/cart"
                 >
 
                     <input
@@ -688,134 +514,225 @@
                         value="<%= product.getProductId() %>"
                     >
 
-                    <input
-                        type="hidden"
+
+                    <!-- SAME SIZE OPTIONS FOR ALL PRODUCTS -->
+
+                    <div class="option-title">
+
+                        Select Size
+
+                    </div>
+
+                    <select
                         name="size"
-                        id="selectedSize"
+                        id="size"
+                        required
                     >
 
-                    <input
-                        type="hidden"
+                        <option value="XS">
+                            XS
+                        </option>
+
+                        <option value="S">
+                            S
+                        </option>
+
+                        <option value="M" selected>
+                            M
+                        </option>
+
+                        <option value="L">
+                            L
+                        </option>
+
+                        <option value="XL">
+                            XL
+                        </option>
+
+                        <option value="XXL">
+                            XXL
+                        </option>
+
+                    </select>
+
+
+                    <!-- SAME COLOR OPTIONS FOR ALL PRODUCTS -->
+
+                    <div class="option-title">
+
+                        Select Color
+
+                    </div>
+
+                    <select
                         name="color"
-                        id="selectedColor"
+                        id="color"
+                        required
                     >
 
+                        <option value="Black">
+                            Black
+                        </option>
+
+                        <option value="White">
+                            White
+                        </option>
+
+                        <option value="Red">
+                            Red
+                        </option>
+
+                        <option value="Blue">
+                            Blue
+                        </option>
+
+                        <option value="Pink">
+                            Pink
+                        </option>
+
+                        <option value="Green">
+                            Green
+                        </option>
+
+                        <option value="Yellow">
+                            Yellow
+                        </option>
+
+                        <option value="Brown">
+                            Brown
+                        </option>
+
+                    </select>
+
+
+                    <!-- QUANTITY -->
+
+                    <div class="option-title">
+
+                        Quantity
+
+                    </div>
+
                     <input
-                        type="hidden"
+                        class="quantity"
+                        type="number"
                         name="quantity"
-                        id="selectedQuantity"
+                        value="1"
+                        min="1"
+                        max="<%= stockQuantity %>"
+                        required
                     >
 
-                    <button
-                        class="cart-btn"
-                        type="submit"
-                    >
-                        Add to Cart
-                    </button>
+
+                    <!-- ADD TO CART / BUY NOW -->
+
+                    <div class="buttons">
+
+                        <button
+                            type="submit"
+                            class="cart-button"
+                        >
+
+                            &#128722; Add to Cart
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="buy-button"
+                            onclick="buyNow()"
+                        >
+
+                            &#9889; Buy Now
+
+                        </button>
+
+                    </div>
 
                 </form>
 
 
+                <!-- WISHLIST / SHARE -->
 
-                <!-- BUY NOW -->
+                <div class="buttons">
 
-                <button
-                    class="buy-btn"
-                    type="button"
-                    onclick="buyNow();"
-                >
-                    Buy Now
-                </button>
-
-
-
-                <!-- TRY THIS DRESS -->
-
-                <a
-                    class="try-btn"
-                    href="${pageContext.request.contextPath}/trial-room.jsp?productId=<%= product.getProductId() %>"
-                >
-                    👗 Try This Dress
-                </a>
-
-
-            </div>
-
-
-
-            <!-- ==================================================
-                 WISHLIST / SHARE / REVIEWS
-                 ================================================== -->
-
-            <div class="secondary-actions">
-
-
-                <!-- ADD TO WISHLIST -->
-
-                <form
-                    class="wishlist-form"
-                    method="post"
-                    action="${pageContext.request.contextPath}/wishlist"
-                >
-
-                    <input
-                        type="hidden"
-                        name="action"
-                        value="add"
+                    <form
+                        method="post"
+                        action="<%= contextPath %>/wishlist"
                     >
 
-                    <input
-                        type="hidden"
-                        name="productId"
-                        value="<%= product.getProductId() %>"
-                    >
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="add"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="productId"
+                            value="<%= product.getProductId() %>"
+                        >
+
+                        <button
+                            type="submit"
+                            class="wishlist-button"
+                        >
+
+                            &#10084;&#65039; Add to Wishlist
+
+                        </button>
+
+                    </form>
+
 
                     <button
-                        class="wishlist-btn"
-                        type="submit"
+                        type="button"
+                        class="share-button"
+                        onclick="shareProduct()"
                     >
-                        ❤️ Add to Wishlist
+
+                        &#128279; Share
+
                     </button>
 
-                </form>
+                </div>
 
 
+                <!-- PRODUCT INFORMATION -->
 
-                <!-- SHARE -->
+                <div class="product-info-box">
 
-                <button
-                    class="share-btn"
-                    type="button"
-                    onclick="shareProduct();"
-                >
-                    🔗 Share
-                </button>
+                    <div>
 
+                        <strong>Category:</strong>
+                        <%= product.getCategory() %>
+
+                    </div>
+
+                    <div>
+
+                        <strong>Product ID:</strong>
+                        <%= product.getProductId() %>
+
+                    </div>
+
+                </div>
 
 
                 <!-- REVIEWS -->
 
                 <a
-                    class="review-btn"
-                    href="${pageContext.request.contextPath}/review-form?productId=<%= product.getProductId() %>"
+                    class="reviews"
+                    href="<%= contextPath %>/review-form?productId=<%= product.getProductId() %>"
                 >
-                    ⭐ Reviews & Ratings
+
+                    &#11088; View / Add Reviews
+
                 </a>
 
 
-            </div>
-
-
-
-            <!-- SHARE SUCCESS MESSAGE -->
-
-            <div
-                id="shareMessage"
-                class="share-message"
-            >
-                Product link copied successfully!
-            </div>
-
+            <% } %>
 
         </div>
 
@@ -824,295 +741,76 @@
 </div>
 
 
-
-<!-- ================= JAVASCRIPT ================= -->
-
 <script>
-
-
-/* ==================================================
-   ADD TO CART
-   ================================================== */
-
-function prepareCartData() {
-
-    const selectedSize =
-        document.querySelector(
-            'input[name="size"]:checked'
-        );
-
-
-    const selectedColor =
-        document.querySelector(
-            'input[name="color"]:checked'
-        );
-
-
-    const quantityInput =
-        document.getElementById("quantity");
-
-
-    const quantity =
-        parseInt(quantityInput.value);
-
-
-    if (!selectedSize) {
-
-        alert("Please select a size.");
-
-        return false;
-
-    }
-
-
-    if (!selectedColor) {
-
-        alert("Please select a color.");
-
-        return false;
-
-    }
-
-
-    if (isNaN(quantity) || quantity < 1) {
-
-        alert("Please enter a valid quantity.");
-
-        return false;
-
-    }
-
-
-    const maxStock =
-        parseInt(quantityInput.max);
-
-
-    if (quantity > maxStock) {
-
-        alert(
-            "Only " +
-            maxStock +
-            " item(s) available in stock."
-        );
-
-        return false;
-
-    }
-
-
-    document.getElementById("selectedSize").value =
-        selectedSize.value;
-
-
-    document.getElementById("selectedColor").value =
-        selectedColor.value;
-
-
-    document.getElementById("selectedQuantity").value =
-        quantity;
-
-
-    return true;
-
-}
-
-
-
-/* ==================================================
-   BUY NOW
-   ================================================== */
 
 function buyNow() {
 
-    const selectedSize =
-        document.querySelector(
-            'input[name="size"]:checked'
-        );
+    const size =
+        document.getElementById("size").value;
 
-
-    const selectedColor =
-        document.querySelector(
-            'input[name="color"]:checked'
-        );
-
-
-    const quantityInput =
-        document.getElementById("quantity");
-
+    const color =
+        document.getElementById("color").value;
 
     const quantity =
-        parseInt(quantityInput.value);
-
-
-    if (!selectedSize) {
-
-        alert("Please select a size.");
-
-        return;
-
-    }
-
-
-    if (!selectedColor) {
-
-        alert("Please select a color.");
-
-        return;
-
-    }
-
-
-    if (isNaN(quantity) || quantity < 1) {
-
-        alert("Please enter a valid quantity.");
-
-        return;
-
-    }
-
-
-    const maxStock =
-        parseInt(quantityInput.max);
-
-
-    if (quantity > maxStock) {
-
-        alert(
-            "Only " +
-            maxStock +
-            " item(s) available in stock."
-        );
-
-        return;
-
-    }
-
+        document.querySelector(
+            'input[name="quantity"]'
+        ).value;
 
     const productId =
         "<%= product.getProductId() %>";
 
 
-    const contextPath =
-        "${pageContext.request.contextPath}";
+    const url =
+        "<%= contextPath %>/checkout"
+        + "?productId="
+        + encodeURIComponent(productId)
+        + "&size="
+        + encodeURIComponent(size)
+        + "&color="
+        + encodeURIComponent(color)
+        + "&quantity="
+        + encodeURIComponent(quantity);
 
 
-    window.location.href =
-        contextPath +
-        "/checkout?productId=" +
-        encodeURIComponent(productId) +
-        "&size=" +
-        encodeURIComponent(selectedSize.value) +
-        "&color=" +
-        encodeURIComponent(selectedColor.value) +
-        "&quantity=" +
-        encodeURIComponent(quantity);
-
+    window.location.href = url;
 }
 
 
-
-/* ==================================================
-   SHARE PRODUCT
-   ================================================== */
-
 function shareProduct() {
-
-    const productUrl =
-        window.location.href;
-
-
-    const productName =
-        "<%= product.getName() %>";
-
-
-    /* Browser native Share */
 
     if (navigator.share) {
 
         navigator.share({
 
             title:
-                productName + " - SRI SHOP",
+                "<%= product.getName() %>",
 
             text:
-                "Check out this product on SRI SHOP.",
+                "Check out this product on SRI SHOP",
 
             url:
-                productUrl
-
-        }).catch(function(error) {
-
-            /*
-             * User cancelled the share window.
-             * Do nothing.
-             */
-
-            if (error.name === "AbortError") {
-
-                return;
-
-            }
+                window.location.href
 
         });
 
-        return;
+    } else {
 
-    }
+        navigator.clipboard
+            .writeText(window.location.href)
+            .then(function () {
 
-
-    /* Clipboard fallback */
-
-    if (navigator.clipboard) {
-
-        navigator.clipboard.writeText(productUrl)
-            .then(function() {
-
-                showShareMessage();
+                alert("Product link copied!");
 
             })
-            .catch(function() {
+            .catch(function () {
 
-                window.prompt(
-                    "Copy this product link:",
-                    productUrl
-                );
+                alert("Unable to copy product link.");
 
             });
 
-    } else {
-
-        window.prompt(
-            "Copy this product link:",
-            productUrl
-        );
-
     }
 
 }
-
-
-
-/* ==================================================
-   SHARE MESSAGE
-   ================================================== */
-
-function showShareMessage() {
-
-    const message =
-        document.getElementById("shareMessage");
-
-
-    message.style.display = "block";
-
-
-    setTimeout(function() {
-
-        message.style.display = "none";
-
-    }, 2500);
-
-}
-
 
 </script>
 

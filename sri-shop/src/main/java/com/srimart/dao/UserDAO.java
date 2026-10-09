@@ -86,4 +86,47 @@ public class UserDAO {
             }
         }
     }
+
+    // Update buyer profile
+    public boolean updateProfile(
+            long userId,
+            String name,
+            String phone) throws SQLException {
+
+        String sql = """
+                UPDATE users
+                SET name = ?, phone = ?
+                WHERE user_id = ?
+                """;
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, name);
+            statement.setString(2, phone);
+            statement.setLong(3, userId);
+
+            return statement.executeUpdate() > 0;
+        }
+    }
+    // Update user password
+public boolean updatePassword(
+        long userId,
+        String passwordHash) throws SQLException {
+
+    String sql = """
+            UPDATE users
+            SET password_hash = ?
+            WHERE user_id = ?
+            """;
+
+    try (Connection connection = DBConnection.getConnection();
+         PreparedStatement statement = connection.prepareStatement(sql)) {
+
+        statement.setString(1, passwordHash);
+        statement.setLong(2, userId);
+
+        return statement.executeUpdate() > 0;
+    }
+}
 }

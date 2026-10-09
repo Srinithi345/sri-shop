@@ -14,12 +14,17 @@
 %>
 
 <!DOCTYPE html>
+
 <html>
+
 <head>
+
     <meta charset="UTF-8">
-    <title>Sri Shop - Add Product</title>
+
+    <title>SRI SHOP - Add Product</title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
@@ -51,7 +56,7 @@
             background: white;
             padding: 35px;
             border-radius: 18px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
         }
 
         .form-card h2 {
@@ -146,6 +151,7 @@
         }
 
         @media (max-width: 600px) {
+
             .row {
                 grid-template-columns: 1fr;
             }
@@ -158,14 +164,19 @@
             .form-card {
                 padding: 25px;
             }
+
         }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="header">
+
     <h1>SRI SHOP - Add Product</h1>
+
 </div>
 
 <div class="container">
@@ -175,40 +186,66 @@
         <h2>➕ Add New Dress</h2>
 
         <div class="seller-info">
+
             Seller:
             <strong><%= userName %></strong>
+
         </div>
 
         <% if ("true".equals(success)) { %>
+
             <div class="message success">
+
                 ✅ Dress product added successfully!
+
             </div>
+
         <% } %>
 
         <% if ("required".equals(error)) { %>
+
             <div class="message error">
+
                 ❌ Please fill all required fields.
+
             </div>
+
         <% } else if ("invalid".equals(error)) { %>
+
             <div class="message error">
+
                 ❌ Please enter valid price and stock values.
+
             </div>
+
         <% } else if ("failed".equals(error)) { %>
+
             <div class="message error">
+
                 ❌ Product could not be added. Please try again.
+
             </div>
+
         <% } else if ("server".equals(error)) { %>
+
             <div class="message error">
+
                 ❌ Server error occurred. Please try again.
+
             </div>
+
         <% } %>
 
-        <!-- IMPORTANT: Connected to AddProductServlet -->
-        <form action="${pageContext.request.contextPath}/add-product" method="post">
+        <form
+            action="${pageContext.request.contextPath}/add-product"
+            method="post"
+        >
 
-            <!-- Dress Name -->
             <div class="form-group">
-                <label for="name">Dress Name</label>
+
+                <label for="name">
+                    Dress Name
+                </label>
 
                 <input
                     type="text"
@@ -216,67 +253,128 @@
                     name="name"
                     placeholder="Enter dress name"
                     maxlength="150"
-                    required>
+                    required
+                >
+
             </div>
 
-            <!-- Description -->
             <div class="form-group">
-                <label for="description">Description</label>
+
+                <label for="description">
+                    Description
+                </label>
 
                 <textarea
                     id="description"
                     name="description"
-                    placeholder="Enter dress description"></textarea>
+                    placeholder="Enter dress description"
+                ></textarea>
+
             </div>
 
-            <!-- Category + Size -->
             <div class="row">
 
                 <div class="form-group">
-                    <label for="category">Category</label>
+
+                    <label for="category">
+                        Category
+                    </label>
 
                     <select
                         id="category"
                         name="category"
-                        required>
+                        required
+                    >
 
-                        <option value="">Select Category</option>
-                        <option value="Saree">Saree</option>
-                        <option value="Churidar">Churidar</option>
-                        <option value="Anarkali">Anarkali</option>
-                        <option value="Kurti">Kurti</option>
-                        <option value="Gown">Gown</option>
-                        <option value="Lehenga">Lehenga</option>
+                        <option value="">
+                            Select Category
+                        </option>
+
+                        <option value="Saree">
+                            Saree
+                        </option>
+
+                        <option value="Churidar">
+                            Churidar
+                        </option>
+
+                        <option value="Anarkali">
+                            Anarkali
+                        </option>
+
+                        <option value="Kurti">
+                            Kurti
+                        </option>
+
+                        <option value="Gown">
+                            Gown
+                        </option>
+
+                        <option value="Lehenga">
+                            Lehenga
+                        </option>
+
+                        <option value="Accessories">
+                            Accessories
+                        </option>
 
                     </select>
+
                 </div>
 
                 <div class="form-group">
-                    <label for="size">Size</label>
+
+                    <label for="size">
+                        Size
+                    </label>
 
                     <select
                         id="size"
                         name="size"
-                        required>
+                        required
+                    >
 
-                        <option value="">Select Size</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
+                        <option value="">
+                            Select Size
+                        </option>
+
+                        <option value="XS">
+                            XS
+                        </option>
+
+                        <option value="S">
+                            S
+                        </option>
+
+                        <option value="M">
+                            M
+                        </option>
+
+                        <option value="L">
+                            L
+                        </option>
+
+                        <option value="XL">
+                            XL
+                        </option>
+
+                        <option value="XXL">
+                            XXL
+                        </option>
 
                     </select>
+
                 </div>
 
             </div>
 
-            <!-- Color + Price -->
             <div class="row">
 
                 <div class="form-group">
-                    <label for="color">Color</label>
+
+                    <label for="color">
+                        Color
+                    </label>
 
                     <input
                         type="text"
@@ -284,11 +382,16 @@
                         name="color"
                         placeholder="Example: Blue"
                         maxlength="50"
-                        required>
+                        required
+                    >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="price">Price (₹)</label>
+
+                    <label for="price">
+                        Price (₹)
+                    </label>
 
                     <input
                         type="number"
@@ -297,16 +400,20 @@
                         min="0"
                         step="0.01"
                         placeholder="Example: 1499"
-                        required>
+                        required
+                    >
+
                 </div>
 
             </div>
 
-            <!-- Stock + Image -->
             <div class="row">
 
                 <div class="form-group">
-                    <label for="stock">Stock Quantity</label>
+
+                    <label for="stock">
+                        Stock Quantity
+                    </label>
 
                     <input
                         type="number"
@@ -314,24 +421,33 @@
                         name="stock"
                         min="0"
                         placeholder="Example: 20"
-                        required>
+                        required
+                    >
+
                 </div>
 
                 <div class="form-group">
-                    <label for="imageUrl">Image URL</label>
+
+                    <label for="imageUrl">
+                        Image URL
+                    </label>
 
                     <input
                         type="url"
                         id="imageUrl"
                         name="imageUrl"
                         maxlength="500"
-                        placeholder="https://example.com/dress.jpg">
+                        placeholder="https://example.com/dress.jpg"
+                    >
+
                 </div>
 
             </div>
 
-            <!-- Submit -->
-            <button type="submit" class="btn">
+            <button
+                type="submit"
+                class="btn"
+            >
                 Add Dress Product
             </button>
 
@@ -339,7 +455,8 @@
 
         <a
             class="back"
-            href="${pageContext.request.contextPath}/seller-dashboard.jsp">
+            href="${pageContext.request.contextPath}/seller-dashboard.jsp"
+        >
             ← Back to Seller Dashboard
         </a>
 
@@ -348,4 +465,5 @@
 </div>
 
 </body>
+
 </html>

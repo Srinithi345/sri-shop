@@ -1,15 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.math.RoundingMode" %>
 <%@ page import="com.srimart.model.Wishlist" %>
-<%@ page import="com.srimart.model.Product" %>
 
 <%
     List<Wishlist> wishlistItems =
-            (List<Wishlist>) request.getAttribute("wishlistItems");
+        (List<Wishlist>) request.getAttribute("wishlistItems");
 
     if (wishlistItems == null) {
-        wishlistItems = new java.util.ArrayList<>();
+        wishlistItems = new ArrayList<Wishlist>();
     }
+
+    String contextPath = request.getContextPath();
 %>
 
 <!DOCTYPE html>
@@ -17,7 +20,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>My Wishlist - SRI SHOP</title>
 
     <style>
@@ -29,114 +31,192 @@
 
         body {
             font-family: Arial, Helvetica, sans-serif;
-            background: #f8f8f8;
+            background: #f8fafc;
             color: #222;
         }
 
         .navbar {
-            background: #ffffff;
-            border-bottom: 1px solid #e5e5e5;
-            padding: 18px 40px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 18px 35px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
 
         .brand {
             font-size: 24px;
-            font-weight: 700;
-            color: #222;
+            font-weight: bold;
+            color: #115e59;
             text-decoration: none;
         }
 
         .nav-links {
             display: flex;
-            align-items: center;
-            gap: 24px;
+            gap: 22px;
+            flex-wrap: wrap;
         }
 
         .nav-links a {
-            text-decoration: none;
             color: #333;
-            font-size: 15px;
-            font-weight: 500;
+            text-decoration: none;
+            font-size: 14px;
         }
 
         .nav-links a:hover {
-            color: #9b4d73;
+            color: #0f766e;
         }
 
         .page-container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 45px 25px;
+            margin: auto;
+            padding: 40px 24px;
         }
 
         .page-title {
-            font-size: 32px;
+            font-size: 30px;
             margin-bottom: 8px;
         }
 
         .page-subtitle {
-            color: #777;
-            margin-bottom: 30px;
+            color: #6b7280;
+            margin-bottom: 28px;
         }
 
         .wishlist-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 24px;
         }
 
         .wishlist-card {
-            background: #ffffff;
+            background: #fff;
+            border: 1px solid #e5e7eb;
             border-radius: 12px;
             overflow: hidden;
-            border: 1px solid #e7e7e7;
-            padding: 20px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .wishlist-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .image-container {
+            position: relative;
+            height: 280px;
+            background: #f1f5f9;
+            overflow: hidden;
         }
 
         .product-image {
             width: 100%;
-            height: 280px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            background: #f1f1f1;
+            display: block;
+        }
+
+        .image-placeholder {
+            height: 100%;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            color: #6b7280;
+            text-align: center;
+            background: #f1f5f9;
+        }
+
+        .placeholder-visible {
+            display: flex;
+        }
+
+        .placeholder-hidden {
+            display: none;
+        }
+
+        .heart-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #fff;
+            color: #e11d48;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+
+        .product-info {
+            padding: 16px;
         }
 
         .product-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 16px 0;
+            font-size: 17px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            overflow-wrap: anywhere;
         }
 
-        .product-link {
-            display: inline-block;
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f766e;
+            margin-bottom: 16px;
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .view-button,
+        .remove-button {
+            width: 100%;
+            padding: 11px;
+            border-radius: 7px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .view-button {
+            display: block;
             text-decoration: none;
-            color: #333;
-            margin-bottom: 15px;
+            color: #fff;
+            background: #0f766e;
+            border: 1px solid #0f766e;
+        }
+
+        .view-button:hover {
+            background: #115e59;
+        }
+
+        .remove-form {
+            width: 100%;
         }
 
         .remove-button {
-            width: 100%;
-            border: none;
-            background: #222;
-            color: white;
-            padding: 11px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
+            background: #fff;
+            color: #be123c;
+            border: 1px solid #fecdd3;
         }
 
         .remove-button:hover {
-            background: #444;
+            background: #fff1f2;
         }
 
         .empty-wishlist {
-            background: white;
-            border: 1px solid #e5e5e5;
+            background: #fff;
+            border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 60px 25px;
+            padding: 55px 25px;
             text-align: center;
         }
 
@@ -145,39 +225,68 @@
         }
 
         .empty-wishlist p {
-            color: #777;
-            margin-bottom: 25px;
+            color: #6b7280;
+            margin-bottom: 24px;
         }
 
         .shop-button {
             display: inline-block;
-            background: #222;
-            color: white;
-            text-decoration: none;
             padding: 12px 24px;
-            border-radius: 6px;
+            background: #0f766e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 7px;
         }
 
-        @media (max-width: 700px) {
+        .shop-button:hover {
+            background: #115e59;
+        }
 
+        @media (max-width: 650px) {
             .navbar {
-                padding: 15px 20px;
+                padding: 16px;
                 flex-direction: column;
                 gap: 15px;
             }
 
             .nav-links {
-                flex-wrap: wrap;
                 justify-content: center;
                 gap: 15px;
             }
 
             .page-container {
-                padding: 30px 15px;
+                padding: 28px 16px;
             }
 
             .page-title {
                 font-size: 26px;
+            }
+
+            .wishlist-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+            }
+
+            .image-container {
+                height: 200px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+
+            .product-title {
+                font-size: 15px;
+            }
+
+            .product-price {
+                font-size: 18px;
+            }
+
+            .view-button,
+            .remove-button {
+                padding: 9px 5px;
+                font-size: 12px;
             }
         }
     </style>
@@ -186,99 +295,127 @@
 <body>
 
 <nav class="navbar">
-
-    <a class="brand"
-       href="<%= request.getContextPath() %>/">
-        SRI SHOP
-    </a>
+    <a class="brand" href="<%= contextPath %>/">SRI SHOP</a>
 
     <div class="nav-links">
-
-        <a href="<%= request.getContextPath() %>/products">
-            Shop
-        </a>
-
-        <a href="<%= request.getContextPath() %>/wishlist">
-            Wishlist
-        </a>
-
-        <a href="<%= request.getContextPath() %>/cart">
-            Cart
-        </a>
-
-        <a href="<%= request.getContextPath() %>/buyer-dashboard.jsp">
-            Profile
-        </a>
-
-        <a href="<%= request.getContextPath() %>/logout">
-            Logout
-        </a>
-
+        <a href="<%= contextPath %>/products">Shop</a>
+        <a href="<%= contextPath %>/wishlist">Wishlist</a>
+        <a href="<%= contextPath %>/cart">Cart</a>
+        <a href="<%= contextPath %>/buyer-dashboard.jsp">Profile</a>
+        <a href="<%= contextPath %>/logout">Logout</a>
     </div>
-
 </nav>
 
 <main class="page-container">
 
-    <h1 class="page-title">My Wishlist</h1>
-
+    <h1 class="page-title">My Wishlist &#9829;</h1>
     <p class="page-subtitle">
-        Your saved products
+        Your favourite dresses, saved in one place.
     </p>
 
     <% if (wishlistItems.isEmpty()) { %>
 
         <div class="empty-wishlist">
-
             <h2>Your wishlist is empty</h2>
-
-            <p>
-                You haven't added any products to your wishlist yet.
-            </p>
+            <p>You haven't added any products to your wishlist yet.</p>
 
             <a class="shop-button"
-               href="<%= request.getContextPath() %>/products">
+               href="<%= contextPath %>/products">
                 Continue Shopping
             </a>
-
         </div>
 
     <% } else { %>
 
         <div class="wishlist-grid">
 
-            <% for (Wishlist item : wishlistItems) { %>
+            <% for (Wishlist item : wishlistItems) {
 
-                <div class="wishlist-card">
+                String productName = item.getProductName();
+                String imageUrl = item.getProductImage();
 
-                    <div class="product-title">
-                        Product #<%= item.getProductId() %>
+                if (productName == null || productName.trim().isEmpty()) {
+                    productName = "Dress #" + item.getProductId();
+                }
+
+                boolean hasImage =
+                    imageUrl != null && !imageUrl.trim().isEmpty();
+            %>
+
+                <article class="wishlist-card">
+
+                    <div class="image-container">
+
+                        <% if (hasImage) { %>
+
+                            <img
+                                class="product-image"
+                                src="<%= imageUrl %>"
+                                alt="<%= productName %>"
+                                loading="lazy"
+                                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('placeholder-hidden'); this.nextElementSibling.classList.add('placeholder-visible');">
+
+                        <% } %>
+
+                        <div class="image-placeholder <%= hasImage ? "placeholder-hidden" : "placeholder-visible" %>">
+                            Dress image unavailable
+                        </div>
+
+                        <span class="heart-icon">&#9829;</span>
+
                     </div>
 
-                    <a class="product-link"
-                       href="<%= request.getContextPath() %>/product-details?id=<%= item.getProductId() %>">
-                        View Product
-                    </a>
+                    <div class="product-info">
 
-                    <form method="post"
-                          action="<%= request.getContextPath() %>/wishlist">
+                        <h2 class="product-title">
+                            <%= productName %>
+                        </h2>
 
-                        <input type="hidden"
-                               name="action"
-                               value="remove">
+                        <div class="product-price">
+                            <% if (item.getProductPrice() != null) { %>
 
-                        <input type="hidden"
-                               name="productId"
-                               value="<%= item.getProductId() %>">
+                                &#8377;<%= item.getProductPrice()
+                                    .setScale(2, RoundingMode.HALF_UP)
+                                    .toPlainString() %>
 
-                        <button type="submit"
-                                class="remove-button">
-                            Remove from Wishlist
-                        </button>
+                            <% } else { %>
 
-                    </form>
+                                Price unavailable
 
-                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="card-actions">
+
+                            <a class="view-button"
+                               href="<%= contextPath %>/product-details?id=<%= item.getProductId() %>">
+                                View Dress
+                            </a>
+
+                            <form class="remove-form"
+                                  method="post"
+                                  action="<%= contextPath %>/wishlist"
+                                  onsubmit="return confirm('Remove this dress from your wishlist?');">
+
+                                <input type="hidden"
+                                       name="action"
+                                       value="remove">
+
+                                <input type="hidden"
+                                       name="productId"
+                                       value="<%= item.getProductId() %>">
+
+                                <button type="submit" class="remove-button">
+                                    Remove from Wishlist
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </article>
 
             <% } %>
 

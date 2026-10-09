@@ -1,10 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@ page import="java.math.BigDecimal" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+
 <%
-    String userName = (String) session.getAttribute("userName");
+    String contextPath = request.getContextPath();
+
+    String userName =
+            (String) session.getAttribute("userName");
 
     if (userName == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(
+                contextPath + "/login.jsp"
+        );
         return;
     }
 
@@ -17,35 +26,46 @@
     Integer differentVarieties =
             (Integer) request.getAttribute("differentVarieties");
 
-    java.math.BigDecimal totalSpent =
-            (java.math.BigDecimal) request.getAttribute("totalSpent");
+    BigDecimal totalSpent =
+            (BigDecimal) request.getAttribute("totalSpent");
 
     Integer cartItemCount =
             (Integer) request.getAttribute("cartItemCount");
 
-    java.math.BigDecimal cartTotal =
-            (java.math.BigDecimal) request.getAttribute("cartTotal");
+    BigDecimal cartTotal =
+            (BigDecimal) request.getAttribute("cartTotal");
 
-    java.util.List<java.util.Map<String, Object>> recentOrders =
-            (java.util.List<java.util.Map<String, Object>>)
+    List<Map<String, Object>> recentOrders =
+            (List<Map<String, Object>>)
                     request.getAttribute("recentOrders");
 
-    java.util.List<java.util.Map<String, Object>> cartPreview =
-            (java.util.List<java.util.Map<String, Object>>)
+    List<Map<String, Object>> cartPreview =
+            (List<Map<String, Object>>)
                     request.getAttribute("cartPreview");
 
-    if (totalOrders == null) totalOrders = 0;
-    if (totalItems == null) totalItems = 0;
-    if (differentVarieties == null) differentVarieties = 0;
+    if (totalOrders == null) {
+        totalOrders = 0;
+    }
 
-    if (totalSpent == null)
-        totalSpent = java.math.BigDecimal.ZERO;
+    if (totalItems == null) {
+        totalItems = 0;
+    }
 
-    if (cartItemCount == null)
+    if (differentVarieties == null) {
+        differentVarieties = 0;
+    }
+
+    if (totalSpent == null) {
+        totalSpent = BigDecimal.ZERO;
+    }
+
+    if (cartItemCount == null) {
         cartItemCount = 0;
+    }
 
-    if (cartTotal == null)
-        cartTotal = java.math.BigDecimal.ZERO;
+    if (cartTotal == null) {
+        cartTotal = BigDecimal.ZERO;
+    }
 %>
 
 <!DOCTYPE html>
@@ -55,7 +75,8 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>SRI SHOP - Buyer Dashboard</title>
 
@@ -68,640 +89,711 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #f8fafc;
+    background: #f0fdfa;
     color: #134e4a;
 }
 
-/* =========================================
+/* =========================
    HEADER
-========================================= */
+========================= */
 
 .header {
-    background: #0f766e;
-    color: white;
-    padding: 15px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+
+    background: #0f766e;
+    color: white;
+
+    min-height: 72px;
+
+    padding: 12px 30px;
+
+    display: flex;
+    align-items: center;
+    gap: 25px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0, 0, 0, 0.14);
 }
 
 .logo {
-    font-size: 25px;
+    font-size: 23px;
     font-weight: bold;
+
     white-space: nowrap;
+
+    letter-spacing: 0.3px;
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-/* =========================================
-   SEARCH FORM
-========================================= */
+/* SEARCH */
 
 .search-form {
+    flex: 1;
+
     display: flex;
-    align-items: center;
-    background: white;
-    border-radius: 22px;
-    overflow: hidden;
-    height: 40px;
-    margin: 0 3px;
+
+    max-width: 430px;
+
+    height: 42px;
 }
 
-.search-input {
-    width: 180px;
-    height: 40px;
+.search-form input {
+    flex: 1;
+
     border: none;
     outline: none;
-    padding: 9px 12px;
+
+    padding: 11px 14px;
+
+    border-radius: 8px 0 0 8px;
+
     font-size: 14px;
-    color: #134e4a;
-    background: white;
+
+    min-width: 100px;
 }
 
-.search-input::placeholder {
-    color: #94a3b8;
+.search-form input:focus {
+    box-shadow:
+        0 0 0 2px
+        rgba(255, 255, 255, 0.35);
 }
 
-.search-button {
-    height: 40px;
-    width: 42px;
+.search-form button {
+    width: 48px;
+
     border: none;
+
     background: white;
+
     color: #0f766e;
+
+    border-radius: 0 8px 8px 0;
+
     cursor: pointer;
-    font-size: 16px;
-    transition: background 0.2s ease;
+
+    font-size: 18px;
+
+    transition: 0.2s;
 }
 
-.search-button:hover {
-    background: #f1f5f9;
+.search-form button:hover {
+    background: #ccfbf1;
 }
 
-/* =========================================
-   NAVIGATION LINKS
-========================================= */
+/* NAVIGATION */
 
-.nav-link {
+.nav {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-left: auto;
+}
+
+.nav a {
+    position: relative;
+
     color: white;
+
     text-decoration: none;
+
+    font-size: 13px;
+
     font-weight: bold;
-    padding: 9px 11px;
+
+    white-space: nowrap;
+
+    padding: 9px 10px;
+
     border-radius: 8px;
-    transition: background 0.2s ease;
-    white-space: nowrap;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    transition:
+        background 0.2s,
+        transform 0.2s;
 }
 
-.nav-link:hover {
-    background: rgba(255,255,255,0.15);
-}
+.nav a:hover {
+    background: rgba(255, 255, 255, 0.14);
 
-/* CART */
-
-.cart-top {
-    background: white;
-    color: #0f766e;
-    padding: 9px 15px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: bold;
-    white-space: nowrap;
-    transition: transform 0.2s ease;
-}
-
-.cart-top:hover {
     transform: translateY(-1px);
 }
 
-/* PROFILE */
+.nav a:last-child {
+    background: rgba(255, 255, 255, 0.12);
+}
 
-.profile-link {
+.nav a:last-child:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* CART BADGE */
+
+.cart-badge {
+    min-width: 20px;
+    height: 20px;
+
+    padding: 2px 6px;
+
+    border-radius: 20px;
+
+    background: #ef4444;
+
     color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 9px 11px;
-    border-radius: 8px;
-    white-space: nowrap;
+
+    font-size: 11px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.profile-link:hover {
-    background: rgba(255,255,255,0.15);
-}
-
-/* LOGOUT */
-
-.logout {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 9px 11px;
-    border-radius: 8px;
-    white-space: nowrap;
-}
-
-.logout:hover {
-    background: rgba(255,255,255,0.15);
-}
-
-/* =========================================
-   MAIN
-========================================= */
-
-.container {
-    max-width: 1200px;
-    margin: 35px auto;
-    padding: 0 20px;
-}
-
-/* =========================================
+/* =========================
    WELCOME
-========================================= */
+========================= */
 
 .welcome {
-    background: linear-gradient(135deg, #0f766e, #115e59);
-    color: white;
-    padding: 35px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+    max-width: 1200px;
+
+    margin: 35px auto 20px;
+
+    padding: 0 20px;
 }
 
 .welcome h1 {
     margin: 0 0 8px;
-    font-size: 30px;
+
+    color: #115e59;
 }
 
 .welcome p {
     margin: 0;
-    opacity: 0.9;
+
+    color: #64748b;
 }
 
-/* =========================================
-   SECTION
-========================================= */
+/* =========================
+   MAIN
+========================= */
 
-.section-title {
-    margin: 32px 0 18px;
-    font-size: 22px;
-    color: #115e59;
+.container {
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding: 0 20px 50px;
 }
 
-/* =========================================
-   SUMMARY
-========================================= */
+/* =========================
+   SUMMARY CARDS
+========================= */
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
     gap: 18px;
+
+    margin-top: 25px;
 }
 
 .summary-card {
     background: white;
+
     padding: 22px;
+
     border-radius: 16px;
-    box-shadow: 0 7px 22px rgba(0,0,0,0.07);
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0, 0, 0, 0.09);
 }
 
 .summary-icon {
     font-size: 28px;
+
+    margin-bottom: 10px;
 }
 
-.summary-number {
-    font-size: 27px;
-    font-weight: bold;
-    color: #0f766e;
-    margin-top: 8px;
-}
-
-.summary-label {
+.summary-title {
     color: #64748b;
-    margin-top: 5px;
+
+    font-size: 14px;
+
+    margin-bottom: 8px;
 }
 
-/* =========================================
-   ACTIONS
-========================================= */
+.summary-value {
+    color: #0f766e;
 
-.actions {
+    font-size: 26px;
+
+    font-weight: bold;
+}
+
+/* =========================
+   QUICK ACTIONS
+========================= */
+
+.section-title {
+    margin-top: 35px;
+
+    margin-bottom: 16px;
+
+    color: #115e59;
+}
+
+.quick-actions {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
     gap: 18px;
 }
 
 .action-card {
     background: white;
+
     padding: 22px;
+
     border-radius: 16px;
-    text-align: center;
-    box-shadow: 0 7px 22px rgba(0,0,0,0.07);
+
+    text-decoration: none;
+
+    color: #134e4a;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.06);
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0, 0, 0, 0.10);
 }
 
 .action-icon {
-    font-size: 38px;
+    font-size: 30px;
+
+    margin-bottom: 10px;
 }
 
-.action-card h3 {
-    margin: 10px 0;
-}
+.action-title {
+    font-size: 18px;
 
-.btn {
-    display: inline-block;
-    background: #0f766e;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 9px;
-    text-decoration: none;
     font-weight: bold;
-    margin-top: 8px;
+
+    margin-bottom: 5px;
 }
 
-.btn:hover {
-    background: #115e59;
+.action-description {
+    color: #64748b;
+
+    font-size: 13px;
 }
 
-/* =========================================
-   DASHBOARD PANELS
-========================================= */
+/* =========================
+   TWO COLUMNS
+========================= */
 
-.dashboard-grid {
+.two-columns {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 22px;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 20px;
+
     margin-top: 25px;
 }
 
 .panel {
     background: white;
-    padding: 25px;
-    border-radius: 18px;
-    box-shadow: 0 7px 22px rgba(0,0,0,0.07);
+
+    border-radius: 16px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.06);
 }
 
 .panel h2 {
     margin-top: 0;
+
     color: #115e59;
+
+    font-size: 19px;
 }
 
-/* =========================================
+/* =========================
    ORDERS
-========================================= */
+========================= */
 
-.order {
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 12px;
+.order-item {
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid #e2e8f0;
 }
 
-.order-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-number {
     font-weight: bold;
-}
 
-.status {
-    background: #ccfbf1;
     color: #0f766e;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 12px;
 }
 
-.order-details {
+.order-info {
     color: #64748b;
-    margin-top: 8px;
-    font-size: 14px;
-    line-height: 1.7;
+
+    font-size: 13px;
+
+    margin-top: 4px;
 }
 
-/* =========================================
+/* =========================
    CART
-========================================= */
+========================= */
 
 .cart-item {
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid #e2e8f0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
 }
 
 .cart-name {
     font-weight: bold;
-    color: #134e4a;
-    font-size: 16px;
 }
 
 .cart-details {
     color: #64748b;
+
     font-size: 13px;
-    margin-top: 7px;
-    line-height: 1.6;
+
+    margin-top: 4px;
 }
 
 .cart-price {
     color: #0f766e;
-    font-weight: bold;
-    margin-top: 7px;
-}
 
-.cart-total {
-    border-top: 2px solid #e2e8f0;
-    margin-top: 15px;
-    padding-top: 15px;
-    display: flex;
-    justify-content: space-between;
     font-weight: bold;
+
+    white-space: nowrap;
 }
 
 .empty {
-    text-align: center;
     color: #64748b;
-    padding: 25px 5px;
+
+    padding: 15px 0;
 }
 
-.empty-icon {
-    font-size: 45px;
-    margin-bottom: 8px;
+.cart-total {
+    margin-top: 15px;
+
+    padding-top: 15px;
+
+    border-top:
+        2px solid #e2e8f0;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    font-weight: bold;
 }
 
-/* =========================================
-   SRI BOT BUTTON
-========================================= */
+.cart-total-value {
+    color: #0f766e;
+}
+
+/* =========================
+   VIEW BUTTON
+========================= */
+
+.view-btn {
+    display: inline-block;
+
+    margin-top: 12px;
+
+    background: #0f766e;
+
+    color: white;
+
+    padding: 9px 15px;
+
+    border-radius: 7px;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.view-btn:hover {
+    background: #115e59;
+
+    transform: translateY(-1px);
+}
+
+/* =========================
+   CHAT
+========================= */
 
 .chat-button {
     position: fixed;
+
     right: 25px;
+
     bottom: 25px;
-    width: 62px;
-    height: 62px;
+
+    width: 60px;
+    height: 60px;
+
     border-radius: 50%;
+
     border: none;
+
     background: #0f766e;
+
     color: white;
-    font-size: 27px;
+
+    font-size: 24px;
+
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.20);
-    z-index: 1000;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.20);
+
+    z-index: 2000;
+
+    transition: 0.2s;
 }
 
-/* =========================================
-   SRI BOT WINDOW
-========================================= */
+.chat-button:hover {
+    transform: scale(1.06);
 
-.bot-window {
+    background: #115e59;
+}
+
+.chat-window {
     display: none;
+
     position: fixed;
+
     right: 25px;
-    bottom: 100px;
+
+    bottom: 95px;
+
     width: 360px;
+
     height: 500px;
+
     background: white;
-    border-radius: 18px;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 12px 40px
+        rgba(0, 0, 0, 0.20);
+
     overflow: hidden;
-    z-index: 999;
+
+    z-index: 2000;
 }
 
-.bot-header {
+.chat-header {
     background: #0f766e;
+
     color: white;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-.bot-header strong {
-    font-size: 18px;
-}
-
-.bot-header small {
-    display: block;
-    margin-top: 3px;
-    opacity: 0.8;
-}
-
-.bot-close {
-    border: none;
-    background: transparent;
-    color: white;
-    font-size: 25px;
-    cursor: pointer;
-}
-
-.bot-messages {
-    height: 390px;
-    overflow-y: auto;
     padding: 15px;
-    background: #f8fafc;
+
+    font-weight: bold;
+}
+
+.chat-body {
+    height: calc(100% - 55px);
+
+    padding: 15px;
+
+    overflow-y: auto;
+
+    color: #475569;
+
+    font-size: 14px;
 }
 
 .bot-message {
-    background: #ccfbf1;
-    color: #134e4a;
+    background: #f0fdfa;
+
     padding: 12px;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    line-height: 1.5;
-    font-size: 14px;
+
+    border-radius: 10px;
+
+    margin-bottom: 10px;
 }
 
-.user-message {
-    background: #0f766e;
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    margin: 10px 0 10px auto;
-    max-width: 85%;
-    line-height: 1.5;
-    font-size: 14px;
-}
+/* =========================
+   RESPONSIVE
+========================= */
 
-.quick-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-}
-
-.quick-buttons button {
-    border: 1px solid #0f766e;
-    background: white;
-    color: #0f766e;
-    padding: 7px 9px;
-    border-radius: 15px;
-    cursor: pointer;
-    font-size: 12px;
-}
-
-.quick-buttons button:hover {
-    background: #ccfbf1;
-}
-
-.bot-input {
-    height: 60px;
-    display: flex;
-    padding: 10px;
-    gap: 8px;
-    border-top: 1px solid #e2e8f0;
-}
-
-.bot-input input {
-    flex: 1;
-    border: 1px solid #cbd5e1;
-    border-radius: 20px;
-    padding: 10px 14px;
-    outline: none;
-}
-
-.bot-input button {
-    width: 42px;
-    border: none;
-    border-radius: 50%;
-    background: #0f766e;
-    color: white;
-    cursor: pointer;
-    font-size: 17px;
-}
-
-/* =========================================
-   MOBILE
-========================================= */
-
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
     .header {
-        padding: 15px 25px;
+        flex-wrap: wrap;
     }
 
-    .header-right {
-        gap: 4px;
+    .search-form {
+        order: 3;
+
+        max-width: none;
+
+        width: 100%;
     }
 
-    .nav-link,
-    .profile-link,
-    .logout {
-        padding: 8px 7px;
-        font-size: 14px;
+    .nav {
+        margin-left: 0;
+
+        overflow-x: auto;
+
+        width: 100%;
+
+        padding-bottom: 2px;
     }
 
-    .cart-top {
-        padding: 8px 12px;
-        font-size: 14px;
+    .summary-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 
-    .search-input {
-        width: 150px;
-    }
-
-    .summary-grid,
-    .actions {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
+    .quick-actions {
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 }
 
 @media (max-width: 700px) {
 
     .header {
-        position: relative;
-        flex-direction: column;
-        align-items: stretch;
+        padding: 14px 18px;
+
         gap: 12px;
-        padding: 15px 20px;
     }
 
     .logo {
-        text-align: center;
+        font-size: 19px;
     }
 
-    .header-right {
-        justify-content: center;
-    }
-
-    /* MOBILE SEARCH */
-
-    .search-form {
+    .nav {
         width: 100%;
-        grid-column: 1 / -1;
+
+        gap: 5px;
+
+        overflow-x: auto;
     }
 
-    .search-input {
-        width: 100%;
-        flex: 1;
+    .nav a {
+        font-size: 12px;
+
+        padding: 8px 7px;
     }
 
-    .nav-link,
-    .profile-link,
-    .logout {
-        font-size: 13px;
-        padding: 7px 6px;
-    }
-
-    .cart-top {
-        font-size: 13px;
-        padding: 7px 10px;
+    .nav a span {
+        display: inline;
     }
 
     .summary-grid,
-    .actions {
+    .quick-actions,
+    .two-columns {
         grid-template-columns: 1fr;
     }
 
     .welcome {
-        padding: 25px;
+        margin-top: 25px;
     }
 
-    .welcome h1 {
-        font-size: 24px;
+    .chat-window {
+        right: 12px;
+
+        bottom: 85px;
+
+        width: calc(100% - 24px);
     }
 
-    .bot-window {
-        right: 10px;
-        bottom: 90px;
-        width: calc(100% - 20px);
-        height: 480px;
+    .chat-button {
+        right: 18px;
+
+        bottom: 18px;
     }
 }
 
 @media (max-width: 450px) {
 
-    .header-right {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        width: 100%;
+    .nav {
+        gap: 2px;
     }
 
-    /* SEARCH TAKES FULL ROW */
+    .nav a {
+        padding: 7px 5px;
+
+        font-size: 11px;
+    }
+
+    .logo {
+        width: 100%;
+    }
 
     .search-form {
         width: 100%;
-        grid-column: 1 / -1;
     }
-
-    .search-input {
-        width: 100%;
-    }
-
-    .nav-link,
-    .profile-link,
-    .logout,
-    .cart-top {
-        text-align: center;
-        width: 100%;
-    }
-
 }
 
 </style>
@@ -710,121 +802,125 @@ body {
 
 <body>
 
-<!-- =========================================
-     HEADER / NAVIGATION
-========================================= -->
 
-<div class="header">
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="header">
 
     <div class="logo">
-        🛍️ SRI SHOP
+        &#128722; SRI SHOP
     </div>
 
-    <div class="header-right">
 
-        <!-- SEARCH -->
+    <form class="search-form"
+          action="<%= contextPath %>/products"
+          method="get">
 
-        <form
-            class="search-form"
-            action="${pageContext.request.contextPath}/products"
-            method="get">
+        <input
+            type="text"
+            name="search"
+            placeholder="Search dresses..."
+            autocomplete="off">
 
-            <input
-                type="text"
-                name="search"
-                class="search-input"
-                placeholder="Search dresses..."
-                autocomplete="off">
+        <button type="submit">
+            &#128269;
+        </button>
 
-            <button
-                type="submit"
-                class="search-button">
-
-                🔍
-
-            </button>
-
-        </form>
+    </form>
 
 
-        <!-- ACCESSORIES -->
+    <nav class="nav">
 
-        <a
-            class="nav-link"
-            href="${pageContext.request.contextPath}/products">
+        <a href="<%= contextPath %>/products"
+           title="Shop">
 
-            👜 Accessories
+            &#128087;
+
+            <span>
+                Shop
+            </span>
 
         </a>
 
 
-        <!-- WISHLIST -->
+        <a href="<%= contextPath %>/products?category=Accessories"
+           title="Accessories">
 
-        <a
-            class="nav-link"
-            href="${pageContext.request.contextPath}/wishlist">
+            &#128091;
 
-            ❤️ Wishlist
+            <span>
+                Accessories
+            </span>
 
         </a>
 
 
-        <!-- CART -->
+        <a href="<%= contextPath %>/wishlist"
+           title="Wishlist">
 
-        <a
-            class="cart-top"
-            href="${pageContext.request.contextPath}/cart">
+            &#10084;&#65039;
 
-            🛒 Cart
+            <span>
+                Wishlist
+            </span>
+
+        </a>
+
+
+        <a href="<%= contextPath %>/cart"
+           title="Cart">
+
+            &#128722;
+
+            <span>
+                Cart
+            </span>
 
             <% if (cartItemCount > 0) { %>
-                (<%= cartItemCount %>)
+
+                <b class="cart-badge">
+                    <%= cartItemCount %>
+                </b>
+
             <% } %>
 
         </a>
 
 
-        <!-- PROFILE -->
+        <a href="<%= contextPath %>/profile"
+           title="Profile">
 
-        <a
-            class="profile-link"
-            href="${pageContext.request.contextPath}/buyer-dashboard">
+            &#128100;
 
-            👤 Profile
+            <span>
+                Profile
+            </span>
 
         </a>
 
 
-        <!-- LOGOUT -->
-
-        <a
-            class="logout"
-            href="${pageContext.request.contextPath}/logout">
+        <a href="<%= contextPath %>/logout"
+           title="Logout">
 
             Logout
 
         </a>
 
-    </div>
+    </nav>
 
-</div>
-
-
-<!-- =========================================
-     MAIN CONTAINER
-========================================= -->
-
-<div class="container">
+</header>
 
 
-<!-- =========================================
+<!-- =========================
      WELCOME
-========================================= -->
+========================= -->
 
 <div class="welcome">
 
     <h1>
-        Welcome back, <%= userName %>! 👋
+        Welcome back, <%= userName %> &#128075;
     </h1>
 
     <p>
@@ -834,480 +930,360 @@ body {
 </div>
 
 
-<!-- =========================================
-     SUMMARY
-========================================= -->
+<div class="container">
 
-<h2 class="section-title">
-    📊 Your Shopping Summary
-</h2>
 
-<div class="summary-grid">
+    <!-- =========================
+         SUMMARY
+    ========================= -->
 
-    <div class="summary-card">
+    <div class="summary-grid">
 
-        <div class="summary-icon">
-            📦
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                &#128230;
+            </div>
+
+            <div class="summary-title">
+                Total Orders
+            </div>
+
+            <div class="summary-value">
+                <%= totalOrders %>
+            </div>
+
         </div>
 
-        <div class="summary-number">
-            <%= totalOrders %>
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                &#128087;
+            </div>
+
+            <div class="summary-title">
+                Total Items
+            </div>
+
+            <div class="summary-value">
+                <%= totalItems %>
+            </div>
+
         </div>
 
-        <div class="summary-label">
-            Total Orders
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                &#128717;
+            </div>
+
+            <div class="summary-title">
+                Different Varieties
+            </div>
+
+            <div class="summary-value">
+                <%= differentVarieties %>
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+                &#128176;
+            </div>
+
+            <div class="summary-title">
+                Total Spent
+            </div>
+
+            <div class="summary-value">
+                &#8377;<%= totalSpent %>
+            </div>
+
         </div>
 
     </div>
 
 
-    <div class="summary-card">
+    <!-- =========================
+         QUICK ACTIONS
+    ========================= -->
 
-        <div class="summary-icon">
-            🛍️
-        </div>
-
-        <div class="summary-number">
-            <%= totalItems %>
-        </div>
-
-        <div class="summary-label">
-            Total Items
-        </div>
-
-    </div>
-
-
-    <div class="summary-card">
-
-        <div class="summary-icon">
-            🎨
-        </div>
-
-        <div class="summary-number">
-            <%= differentVarieties %>
-        </div>
-
-        <div class="summary-label">
-            Different Varieties
-        </div>
-
-    </div>
-
-
-    <div class="summary-card">
-
-        <div class="summary-icon">
-            💰
-        </div>
-
-        <div class="summary-number">
-            ₹<%= totalSpent %>
-        </div>
-
-        <div class="summary-label">
-            Total Spent
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================
-     QUICK ACTIONS
-========================================= -->
-
-<h2 class="section-title">
-    ⚡ Quick Actions
-</h2>
-
-<div class="actions">
-
-    <div class="action-card">
-
-        <div class="action-icon">
-            👗
-        </div>
-
-        <h3>
-            Browse Dresses
-        </h3>
-
-        <a
-            class="btn"
-            href="${pageContext.request.contextPath}/products">
-
-            Shop Now
-
-        </a>
-
-    </div>
-
-
-    <div class="action-card">
-
-        <div class="action-icon">
-            🛒
-        </div>
-
-        <h3>
-            My Cart
-        </h3>
-
-        <a
-            class="btn"
-            href="${pageContext.request.contextPath}/cart">
-
-            View Cart
-
-        </a>
-
-    </div>
-
-
-    <div class="action-card">
-
-        <div class="action-icon">
-            📦
-        </div>
-
-        <h3>
-            My Orders
-        </h3>
-
-        <a
-            class="btn"
-            href="${pageContext.request.contextPath}/orders">
-
-            View Orders
-
-        </a>
-
-    </div>
-
-
-    <div class="action-card">
-
-        <div class="action-icon">
-            ⭐
-        </div>
-
-        <h3>
-            My Reviews
-        </h3>
-
-        <a
-            class="btn"
-            href="${pageContext.request.contextPath}/reviews">
-
-            View Reviews
-
-        </a>
-
-    </div>
-
-</div>
-
-
-<!-- =========================================
-     RECENT ORDERS + CART
-========================================= -->
-
-<div class="dashboard-grid">
-
-
-<!-- =========================================
-     RECENT ORDERS
-========================================= -->
-
-<div class="panel">
-
-    <h2>
-        📦 Recent Orders
+    <h2 class="section-title">
+        Quick Actions
     </h2>
 
-    <%
 
-    if (recentOrders != null &&
-        !recentOrders.isEmpty()) {
+    <div class="quick-actions">
 
-        for (java.util.Map<String, Object> order
-                : recentOrders) {
 
-            Object orderId =
-                    order.get("orderId");
+        <a class="action-card"
+           href="<%= contextPath %>/products">
 
-            Object amount =
-                    order.get("totalAmount");
+            <div class="action-icon">
+                &#128087;
+            </div>
 
-            Object status =
-                    order.get("status");
+            <div class="action-title">
+                Browse Dresses
+            </div>
 
-            Object createdAt =
-                    order.get("createdAt");
+            <div class="action-description">
+                Explore all available dresses and styles.
+            </div>
 
-    %>
+        </a>
 
-    <div class="order">
 
-        <div class="order-top">
+        <a class="action-card"
+           href="<%= contextPath %>/cart">
 
-            <span>
-                Order #<%= orderId %>
-            </span>
+            <div class="action-icon">
+                &#128722;
+            </div>
 
-            <span class="status">
-                <%= status != null ? status : "PENDING" %>
-            </span>
+            <div class="action-title">
+                My Cart
+            </div>
+
+            <div class="action-description">
+                View and manage items in your cart.
+            </div>
+
+        </a>
+
+
+        <a class="action-card"
+           href="<%= contextPath %>/orders">
+
+            <div class="action-icon">
+                &#128230;
+            </div>
+
+            <div class="action-title">
+                My Orders
+            </div>
+
+            <div class="action-description">
+                Track your previous orders and purchases.
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+         RECENT ORDERS + CART
+    ========================= -->
+
+    <div class="two-columns">
+
+
+        <div class="panel">
+
+            <h2>
+                &#128230; Recent Orders
+            </h2>
+
+
+            <%
+                if (recentOrders != null
+                        && !recentOrders.isEmpty()) {
+
+                    for (Map<String, Object> order :
+                            recentOrders) {
+            %>
+
+
+                <div class="order-item">
+
+                    <div class="order-number">
+
+                        Order #<%= order.get("order_id") %>
+
+                    </div>
+
+
+                    <div class="order-info">
+
+                        Status:
+                        <%= order.get("status") %>
+
+                    </div>
+
+
+                    <div class="order-info">
+
+                        Total:
+                        &#8377;<%= order.get("total_amount") %>
+
+                    </div>
+
+                </div>
+
+
+            <%
+                    }
+
+                } else {
+            %>
+
+
+                <div class="empty">
+                    No orders yet.
+                </div>
+
+
+            <%
+                }
+            %>
+
+
+            <a class="view-btn"
+               href="<%= contextPath %>/orders">
+
+                View All Orders
+
+            </a>
 
         </div>
 
-        <div class="order-details">
 
-            💰 Total:
-            ₹<%= amount != null ? amount : "0.00" %>
+        <div class="panel">
 
-            <br>
+            <h2>
+                &#128722; Cart Preview
+            </h2>
 
-            📅 Date:
-            <%= createdAt != null ? createdAt : "-" %>
+
+            <%
+                if (cartPreview != null
+                        && !cartPreview.isEmpty()) {
+
+                    for (Map<String, Object> item :
+                            cartPreview) {
+            %>
+
+
+                <div class="cart-item">
+
+                    <div>
+
+                        <div class="cart-name">
+
+                            <%= item.get("product_name") %>
+
+                        </div>
+
+
+                        <div class="cart-details">
+
+                            Quantity:
+                            <%= item.get("quantity") %>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="cart-price">
+
+                        &#8377;<%= item.get("subtotal") %>
+
+                    </div>
+
+                </div>
+
+
+            <%
+                    }
+
+                } else {
+            %>
+
+
+                <div class="empty">
+                    Your cart is empty.
+                </div>
+
+
+            <%
+                }
+            %>
+
+
+            <div class="cart-total">
+
+                <span>
+                    Cart Total
+                </span>
+
+                <span class="cart-total-value">
+                    &#8377;<%= cartTotal %>
+                </span>
+
+            </div>
+
+
+            <a class="view-btn"
+               href="<%= contextPath %>/cart">
+
+                View Cart
+
+            </a>
 
         </div>
 
     </div>
-
-    <%
-
-        }
-
-    } else {
-
-    %>
-
-    <div class="empty">
-
-        <div class="empty-icon">
-            📦
-        </div>
-
-        <strong>
-            No recent orders
-        </strong>
-
-        <div style="margin-top:8px;">
-            Your latest orders will appear here.
-        </div>
-
-    </div>
-
-    <%
-
-    }
-
-    %>
-
-    <a
-        class="btn"
-        href="${pageContext.request.contextPath}/orders">
-
-        View All Orders
-
-    </a>
 
 </div>
 
 
-<!-- =========================================
-     CART PREVIEW
-========================================= -->
-
-<div class="panel">
-
-    <h2>
-        🛒 Cart Preview
-    </h2>
-
-    <%
-
-    if (cartPreview != null &&
-        !cartPreview.isEmpty()) {
-
-        for (java.util.Map<String, Object> item
-                : cartPreview) {
-
-            Object name =
-                    item.get("name");
-
-            Object price =
-                    item.get("price");
-
-            Object size =
-                    item.get("size");
-
-            Object color =
-                    item.get("color");
-
-            Object quantity =
-                    item.get("quantity");
-
-            Object itemTotal =
-                    item.get("itemTotal");
-
-    %>
-
-    <div class="cart-item">
-
-        <div class="cart-name">
-
-            👗 <%= name != null ? name : "Product" %>
-
-        </div>
-
-        <div class="cart-details">
-
-            📏 Size:
-            <%= size != null ? size : "-" %>
-
-            <br>
-
-            🎨 Color:
-            <%= color != null ? color : "-" %>
-
-            <br>
-
-            🔢 Quantity:
-            <%= quantity != null ? quantity : 0 %>
-
-        </div>
-
-        <div class="cart-price">
-
-            ₹<%= price != null ? price : "0.00" %>
-
-            ×
-
-            <%= quantity != null ? quantity : 0 %>
-
-            =
-
-            ₹<%= itemTotal != null ? itemTotal : "0.00" %>
-
-        </div>
-
-    </div>
-
-    <%
-
-        }
-
-    %>
-
-    <div class="cart-total">
-
-        <span>
-            Cart Total
-        </span>
-
-        <span>
-            ₹<%= cartTotal %>
-        </span>
-
-    </div>
-
-    <%
-
-    } else {
-
-    %>
-
-    <div class="empty">
-
-        <div class="empty-icon">
-            🛒
-        </div>
-
-        <strong>
-            Your cart is empty
-        </strong>
-
-        <div style="margin-top:8px;">
-            Add your favourite dresses to the cart.
-        </div>
-
-    </div>
-
-    <%
-
-    }
-
-    %>
-
-    <a
-        class="btn"
-        href="${pageContext.request.contextPath}/cart">
-
-        Open Cart
-
-    </a>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =========================================
-     SRI BOT BUTTON
-========================================= -->
+<!-- =========================
+     CHAT BUTTON
+========================= -->
 
 <button
     class="chat-button"
-    onclick="openSriBot()"
-    title="SriBot AI">
+    onclick="toggleChat()">
 
-    🤖
+    &#128172;
 
 </button>
 
 
-<!-- =========================================
-     SRI BOT WINDOW
-========================================= -->
+<!-- =========================
+     CHAT WINDOW
+========================= -->
 
-<div id="sriBot" class="bot-window">
+<div
+    id="chatWindow"
+    class="chat-window">
 
-    <div class="bot-header">
 
-        <div>
+    <div class="chat-header">
 
-            <strong>
-                🤖 SriBot
-            </strong>
-
-            <small>
-                SRI SHOP Assistant
-            </small>
-
-        </div>
-
-        <button
-            class="bot-close"
-            onclick="closeSriBot()">
-
-            ×
-
-        </button>
+        &#129302; SRI BOT
 
     </div>
 
 
-    <div id="botMessages" class="bot-messages">
+    <div class="chat-body">
+
 
         <div class="bot-message">
 
-            👋 Hi! I'm SriBot.
+            Hello <%= userName %>! &#128075;
+
+            <br><br>
+
+            Welcome to SRI SHOP.
 
             <br><br>
 
@@ -1316,241 +1292,41 @@ body {
         </div>
 
 
-        <div class="quick-buttons">
+        <div class="bot-message">
 
-            <button
-                onclick="sendQuickMessage('How can I check my orders?')">
-
-                📦 My Orders
-
-            </button>
-
-
-            <button
-                onclick="sendQuickMessage('How do I add a product to cart?')">
-
-                🛒 Cart Help
-
-            </button>
-
-
-            <button
-                onclick="sendQuickMessage('What payment methods are available?')">
-
-                💳 Payment
-
-            </button>
-
-
-            <button
-                onclick="sendQuickMessage('How can I write a review?')">
-
-                ⭐ Reviews
-
-            </button>
+            You can browse dresses,
+            check your cart,
+            view orders,
+            or explore Accessories.
 
         </div>
-
-    </div>
-
-
-    <div class="bot-input">
-
-        <input
-            type="text"
-            id="botInput"
-            placeholder="Ask SriBot..."
-            onkeydown="if(event.key === 'Enter') sendBotMessage();">
-
-        <button onclick="sendBotMessage()">
-            ➤
-        </button>
 
     </div>
 
 </div>
 
 
-<!-- =========================================
-     SRI BOT JAVASCRIPT
-========================================= -->
-
 <script>
 
-function openSriBot() {
+function toggleChat() {
 
-    document.getElementById("sriBot").style.display = "block";
+    const chat =
+        document.getElementById("chatWindow");
 
-    document.getElementById("botInput").focus();
+    if (chat.style.display === "block") {
 
-}
+        chat.style.display = "none";
 
+    } else {
 
-function closeSriBot() {
-
-    document.getElementById("sriBot").style.display = "none";
-
-}
-
-
-function sendQuickMessage(message) {
-
-    document.getElementById("botInput").value = message;
-
-    sendBotMessage();
-
-}
-
-
-function sendBotMessage() {
-
-    const input =
-        document.getElementById("botInput");
-
-    const message =
-        input.value.trim();
-
-    if (message === "") {
-        return;
-    }
-
-    addUserMessage(message);
-
-    input.value = "";
-
-    setTimeout(function() {
-
-        const reply =
-            getSriBotReply(message);
-
-        addBotMessage(reply);
-
-    }, 400);
-
-}
-
-
-function addUserMessage(message) {
-
-    const messages =
-        document.getElementById("botMessages");
-
-    const div =
-        document.createElement("div");
-
-    div.className = "user-message";
-
-    div.innerText = message;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-}
-
-
-function addBotMessage(message) {
-
-    const messages =
-        document.getElementById("botMessages");
-
-    const div =
-        document.createElement("div");
-
-    div.className = "bot-message";
-
-    div.innerHTML = message;
-
-    messages.appendChild(div);
-
-    messages.scrollTop =
-        messages.scrollHeight;
-
-}
-
-
-function getSriBotReply(message) {
-
-    const text =
-        message.toLowerCase();
-
-
-    if (
-        text.includes("order") ||
-        text.includes("orders")
-    ) {
-
-        return "📦 You can check your orders from <b>My Orders</b>. Your recent orders are also shown on the dashboard.";
+        chat.style.display = "block";
 
     }
-
-
-    if (
-        text.includes("cart") ||
-        text.includes("add")
-    ) {
-
-        return "🛒 Browse our dresses, select your size and color, then click <b>Add to Cart</b>. You can view your cart anytime.";
-
-    }
-
-
-    if (
-        text.includes("payment") ||
-        text.includes("pay")
-    ) {
-
-        return "💳 Currently, <b>Cash on Delivery (COD)</b> is available. Online payment integration can be added later.";
-
-    }
-
-
-    if (
-        text.includes("review") ||
-        text.includes("rating")
-    ) {
-
-        return "⭐ You can use the <b>My Reviews</b> section to view and manage your product reviews.";
-
-    }
-
-
-    if (
-        text.includes("product") ||
-        text.includes("dress")
-    ) {
-
-        return "👗 You can browse available dresses using the <b>Browse Dresses</b> option.";
-
-    }
-
-
-    if (
-        text.includes("hello") ||
-        text.includes("hi") ||
-        text.includes("hey")
-    ) {
-
-        return "👋 Hello! Welcome to Sri Shop. How can I help you?";
-
-    }
-
-
-    if (
-        text.includes("thank")
-    ) {
-
-        return "😊 You're welcome! Happy shopping with Sri Shop!";
-
-    }
-
-
-    return "🤖 I can help you with <b>products, cart, orders, payments and reviews</b>. Try asking about one of these.";
 
 }
 
 </script>
+
 
 </body>
 

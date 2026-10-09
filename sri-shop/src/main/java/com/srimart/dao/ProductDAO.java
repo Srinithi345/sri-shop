@@ -115,6 +115,80 @@ public class ProductDAO {
         return products;
     }
 
+    // GET PRODUCTS BY CATEGORY
+public List<Product> getProductsByCategory(String category) {
+
+    List<Product> products = new ArrayList<>();
+
+    String sql = """
+            SELECT product_id,
+                   seller_id,
+                   name,
+                   description,
+                   category,
+                   size,
+                   color,
+                   price,
+                   stock_quantity,
+                   image_url
+            FROM products
+            WHERE LOWER(category) = LOWER(?)
+            ORDER BY product_id DESC
+            """;
+
+    try (Connection connection = DBConnection.getConnection();
+         PreparedStatement statement =
+                 connection.prepareStatement(sql)) {
+
+        statement.setString(1, category.trim());
+
+        try (ResultSet resultSet =
+                     statement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                Product product = new Product();
+
+                product.setProductId(
+                        resultSet.getLong("product_id"));
+
+                product.setSellerId(
+                        resultSet.getLong("seller_id"));
+
+                product.setName(
+                        resultSet.getString("name"));
+
+                product.setDescription(
+                        resultSet.getString("description"));
+
+                product.setCategory(
+                        resultSet.getString("category"));
+
+                product.setSize(
+                        resultSet.getString("size"));
+
+                product.setColor(
+                        resultSet.getString("color"));
+
+                product.setPrice(
+                        resultSet.getBigDecimal("price"));
+
+                product.setStockQuantity(
+                        resultSet.getInt("stock_quantity"));
+
+                product.setImageUrl(
+                        resultSet.getString("image_url"));
+
+                products.add(product);
+            }
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return products;
+}
 
     // SEARCH PRODUCTS
     public List<Product> searchProducts(String searchTerm) {

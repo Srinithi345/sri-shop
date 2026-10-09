@@ -1,20 +1,39 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8"
+         pageEncoding="UTF-8" %>
+
 <%@ page import="java.util.List" %>
 <%@ page import="com.srimart.model.Product" %>
 
 <%
-    String userName = (String) session.getAttribute("userName");
-    String userRole = (String) session.getAttribute("userRole");
-
-    if (userName == null || !"BUYER".equalsIgnoreCase(userRole)) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
+    String contextPath = request.getContextPath();
 
     List<Product> products =
             (List<Product>) request.getAttribute("products");
 
-    String contextPath = request.getContextPath();
+    if (products == null) {
+        products = java.util.Collections.emptyList();
+    }
+
+    String selectedCategory =
+            request.getAttribute("category") == null
+                    ? ""
+                    : String.valueOf(
+                            request.getAttribute("category")
+                      );
+
+    String searchTerm =
+            request.getAttribute("searchTerm") == null
+                    ? ""
+                    : String.valueOf(
+                            request.getAttribute("searchTerm")
+                      );
+
+    String errorMessage =
+            request.getAttribute("errorMessage") == null
+                    ? ""
+                    : String.valueOf(
+                            request.getAttribute("errorMessage")
+                      );
 %>
 
 <!DOCTYPE html>
@@ -24,303 +43,355 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Sri Shop - Products</title>
+    <title>SRI SHOP - Shop Dresses</title>
 
     <style>
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            color: #222;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8fafc;
+            color: #1f2937;
         }
 
-        /* ================= NAVBAR ================= */
-
-        .navbar {
-            background: #111827;
+        .header {
+            background: #0f766e;
             color: white;
-            padding: 16px 6%;
-
+            padding: 16px 30px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
         }
 
         .logo {
-            font-size: 25px;
+            font-size: 24px;
             font-weight: bold;
+            white-space: nowrap;
         }
 
-        .nav-right {
+        .search-form {
+            flex: 1;
+            min-width: 240px;
+            max-width: 600px;
+            display: flex;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            outline: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 15px;
+        }
+
+        .search-form button {
+            width: 50px;
+            border: none;
+            background: #115e59;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .nav {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .nav-right a {
+        .nav a {
             color: white;
             text-decoration: none;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .logout {
-            background: #ef4444;
-            padding: 8px 14px;
-            border-radius: 7px;
+        .nav a:hover {
+            text-decoration: underline;
         }
-
-        .logout:hover {
-            background: #dc2626;
-        }
-
-        /* ================= MAIN ================= */
 
         .container {
-            width: 90%;
-            max-width: 1300px;
-            margin: 35px auto;
+            width: 92%;
+            max-width: 1400px;
+            margin: 30px auto;
         }
 
-        .heading {
+        .page-title {
+            text-align: center;
             margin-bottom: 25px;
         }
 
-        .heading h1 {
-            font-size: 30px;
-            color: #111827;
+        .page-title h1 {
+            margin: 0 0 8px;
+            color: #115e59;
+            font-size: 32px;
         }
 
-        .heading p {
-            color: #6b7280;
-            margin-top: 7px;
+        .page-title p {
+            margin: 0;
+            color: #64748b;
         }
 
-        /* ================= PRODUCT GRID ================= */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
 
-        .product-grid {
+        .category-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 25px;
+            border: 1px solid #0f766e;
+            background: white;
+            color: #0f766e;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: #0f766e;
+            color: white;
+        }
+
+        .search-result {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #475569;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .empty-message {
+            background: white;
+            border-radius: 12px;
+            padding: 50px 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .empty-message h2 {
+            margin-bottom: 10px;
+            color: #334155;
+        }
+
+        .empty-message p {
+            color: #64748b;
+        }
+
+        .products-grid {
             display: grid;
             grid-template-columns:
-                repeat(auto-fit, minmax(250px, 1fr));
-
+                repeat(auto-fill, minmax(230px, 1fr));
             gap: 25px;
         }
-
-        /* ================= PRODUCT CARD ================= */
 
         .product-card {
             background: white;
             border-radius: 14px;
             overflow: hidden;
-
-            box-shadow:
-                0 4px 15px rgba(0, 0, 0, 0.08);
-
-            transition: 0.25s;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+            transition:
+                transform 0.2s,
+                box-shadow 0.2s;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-
+            transform: translateY(-4px);
             box-shadow:
-                0 8px 25px rgba(0, 0, 0, 0.14);
+                0 10px 25px rgba(0, 0, 0, 0.12);
         }
 
-        /* ================= IMAGE ================= */
+        .product-image-container {
+            width: 100%;
+            height: 280px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
         .product-image {
             width: 100%;
-            height: 280px;
-
-            background: #ccfbf1;
-
-            overflow: hidden;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 280px;
-
-            object-fit: cover;
-
+            height: 100%;
+            object-fit: contain;
+            padding: 8px;
             display: block;
         }
 
         .no-image {
-            color: #64748b;
+            color: #94a3b8;
             font-size: 15px;
         }
-
-        /* ================= PRODUCT INFO ================= */
 
         .product-info {
             padding: 18px;
         }
 
         .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .product-category {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
             font-size: 20px;
             font-weight: bold;
-            margin-bottom: 6px;
-        }
-
-        /* ================= PRODUCT COLOUR ================= */
-
-        .product-color {
-            color: #374151;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        /* ================= CATEGORY ================= */
-
-        .category {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        /* ================= DESCRIPTION ================= */
-
-        .description {
-            color: #6b7280;
-            font-size: 14px;
-
-            line-height: 1.5;
-
-            min-height: 42px;
-
-            margin-bottom: 12px;
-        }
-
-        /* ================= PRICE ================= */
-
-        .price {
-            font-size: 21px;
-            font-weight: bold;
-
             color: #0f766e;
-
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        /* ================= STOCK ================= */
-
-        .stock {
-            font-size: 14px;
+        .product-stock {
+            font-size: 13px;
+            color: #475569;
             margin-bottom: 15px;
         }
 
-        .in-stock {
-            color: #16a34a;
-        }
-
-        .out-stock {
-            color: #dc2626;
-        }
-
-        /* ================= ACTION BUTTONS ================= */
-
         .product-actions {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .details-btn,
-        .wishlist-btn {
-            display: block;
-
-            width: 100%;
-
-            text-align: center;
-
-            text-decoration: none;
-
-            padding: 11px;
-
-            border-radius: 8px;
-
-            font-weight: bold;
-
-            cursor: pointer;
-
+        .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 12px;
             border: none;
-
-            font-size: 14px;
+            border-radius: 7px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
         }
 
-        /* VIEW PRODUCT */
-
-        .details-btn {
+        .btn-view {
             background: #0f766e;
             color: white;
         }
 
-        .details-btn:hover {
+        .btn-view:hover {
             background: #115e59;
         }
 
-        /* WISHLIST */
-
-        .wishlist-btn {
-            background: #fff1f2;
-            color: #be123c;
-            border: 1px solid #fecdd3;
+        .btn-wishlist {
+            background: #fce7f3;
+            color: #be185d;
         }
 
-        .wishlist-btn:hover {
-            background: #ffe4e6;
+        .btn-wishlist:hover {
+            background: #fbcfe8;
         }
 
-        /* ================= EMPTY ================= */
-
-        .empty {
-            text-align: center;
-
-            background: white;
-
-            padding: 50px;
-
-            border-radius: 12px;
-
-            color: #64748b;
+        .wishlist-form {
+            flex: 1;
+            display: flex;
         }
 
-        /* ================= MOBILE ================= */
+        .wishlist-form button {
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+
+            .header {
+                padding: 15px;
+            }
+
+            .search-form {
+                order: 3;
+                width: 100%;
+                max-width: none;
+            }
+
+            .nav {
+                gap: 10px;
+            }
+
+            .products-grid {
+                grid-template-columns:
+                    repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
 
         @media (max-width: 600px) {
 
-            .navbar {
-                padding: 14px 4%;
-            }
-
-            .nav-right {
-                gap: 8px;
-                font-size: 13px;
-            }
-
             .container {
                 width: 94%;
+                margin: 20px auto;
             }
 
-            .product-image,
-            .product-image img {
-                height: 250px;
+            .logo {
+                font-size: 20px;
             }
 
+            .nav {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .page-title h1 {
+                font-size: 26px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .product-image-container {
+                height: 220px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+
+            .product-name {
+                font-size: 15px;
+            }
+
+            .product-price {
+                font-size: 17px;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
         }
 
     </style>
@@ -329,281 +400,343 @@
 
 <body>
 
-<!-- ================= NAVBAR ================= -->
-
-<nav class="navbar">
+<header class="header">
 
     <div class="logo">
-        SRI SHOP
+        &#128717;&#65039; SRI SHOP
     </div>
 
-    <div class="nav-right">
+    <form
+        class="search-form"
+        action="<%= contextPath %>/products"
+        method="get"
+    >
 
-        <span>
-            Hi, <%= userName %>
-        </span>
+        <input
+            type="text"
+            name="search"
+            value="<%= searchTerm %>"
+            placeholder="Search dresses..."
+            autocomplete="off"
+        >
 
-        <a href="<%= contextPath %>/cart">
-            🛒 Cart
+        <button type="submit">
+            &#128269;
+        </button>
+
+    </form>
+
+    <nav class="nav">
+
+        <a href="<%= contextPath %>/products">
+            &#128717;&#65039; Shop
         </a>
 
-        <a href="<%= contextPath %>/orders">
-            📦 Orders
+        <a href="<%= contextPath %>/products?category=Accessories">
+            &#128090; Accessories
         </a>
 
         <a href="<%= contextPath %>/wishlist">
-            ❤️ Wishlist
+            &#10084;&#65039; Wishlist
         </a>
 
-        <a href="<%= contextPath %>/logout"
-           class="logout">
+        <a href="<%= contextPath %>/cart">
+            &#128722; Cart
+        </a>
+
+        <a href="<%= contextPath %>/profile">
+            &#128100; Profile
+        </a>
+
+        <a href="<%= contextPath %>/logout">
             Logout
         </a>
 
-    </div>
+    </nav>
 
-</nav>
+</header>
 
-<!-- ================= MAIN ================= -->
 
 <div class="container">
 
-    <div class="heading">
+    <div class="page-title">
 
         <h1>
-            Explore Our Products
+            Shop Dresses
         </h1>
 
         <p>
-            Choose your favourite dress and add it to your cart.
+            Find your perfect style at SRI SHOP
         </p>
 
     </div>
 
-    <!-- ================= NO PRODUCTS ================= -->
 
-    <% if (products == null || products.isEmpty()) { %>
+    <div class="category-filter">
 
-        <div class="empty">
+        <a
+            href="<%= contextPath %>/products"
+            class="category-btn
+                <%= selectedCategory.isEmpty()
+                    && searchTerm.isEmpty()
+                    ? "active"
+                    : "" %>"
+        >
+            All
+        </a>
+
+
+        <a
+            href="<%= contextPath %>/products?category=Anarkali"
+            class="category-btn
+                <%= "Anarkali".equalsIgnoreCase(
+                        selectedCategory
+                   )
+                    ? "active"
+                    : "" %>"
+        >
+            Anarkali
+        </a>
+
+
+        <a
+            href="<%= contextPath %>/products?category=Kurti"
+            class="category-btn
+                <%= "Kurti".equalsIgnoreCase(
+                        selectedCategory
+                   )
+                    ? "active"
+                    : "" %>"
+        >
+            Kurti
+        </a>
+
+
+        <a
+            href="<%= contextPath %>/products?category=Boys%20Wear"
+            class="category-btn
+                <%= "Boys Wear".equalsIgnoreCase(
+                        selectedCategory
+                   )
+                    ? "active"
+                    : "" %>"
+        >
+            Boys Wear
+        </a>
+
+
+        <a
+            href="<%= contextPath %>/products?category=Accessories"
+            class="category-btn
+                <%= "Accessories".equalsIgnoreCase(
+                        selectedCategory
+                   )
+                    ? "active"
+                    : "" %>"
+        >
+            Accessories
+        </a>
+
+    </div>
+
+
+    <% if (!searchTerm.isEmpty()) { %>
+
+        <div class="search-result">
+
+            Search results for:
+            <strong><%= searchTerm %></strong>
+
+        </div>
+
+    <% } %>
+
+
+    <% if (!errorMessage.isEmpty()) { %>
+
+        <div class="error-message">
+            <%= errorMessage %>
+        </div>
+
+    <% } %>
+
+
+    <% if (products.isEmpty()) { %>
+
+        <div class="empty-message">
 
             <h2>
-                No products available
+                No products found
             </h2>
 
             <p>
-                Please check again later.
+                Try another category or search term.
             </p>
 
         </div>
 
     <% } else { %>
 
-        <!-- ================= PRODUCT GRID ================= -->
 
-        <div class="product-grid">
+        <div class="products-grid">
 
-            <% for (Product product : products) {
+            <% for (Product product : products) { %>
 
-                String imageUrl = product.getImageUrl();
+                <%
+                    String imageUrl = product.getImageUrl();
 
-                if (imageUrl == null ||
-                    imageUrl.trim().isEmpty()) {
+                    if (imageUrl != null) {
 
-                    imageUrl = "";
+                        imageUrl = imageUrl.trim();
 
-                } else if (
-                    imageUrl.startsWith("http://") ||
-                    imageUrl.startsWith("https://")
-                ) {
+                        if (!(imageUrl.startsWith("http://")
+                                || imageUrl.startsWith("https://")
+                                || imageUrl.startsWith("/"))) {
 
-                    // External URL - keep as it is.
+                            imageUrl =
+                                    contextPath
+                                    + "/"
+                                    + imageUrl;
+                        }
+                    }
 
-                } else if (
-                    imageUrl.startsWith("/sri-shop/")
-                ) {
+                    String imageSrc = imageUrl;
 
-                    // Already contains application path.
+                    if (imageUrl != null
+                            && !imageUrl.isEmpty()) {
 
-                } else if (
-                    imageUrl.startsWith("/")
-                ) {
+                        if (imageUrl.contains("?")) {
 
-                    imageUrl = contextPath + imageUrl;
+                            imageSrc =
+                                    imageUrl
+                                    + "&v="
+                                    + product.getProductId();
 
-                } else {
+                        } else {
 
-                    imageUrl =
-                        contextPath + "/" + imageUrl;
-                }
+                            imageSrc =
+                                    imageUrl
+                                    + "?v="
+                                    + product.getProductId();
+                        }
+                    }
+                %>
 
-            %>
 
-            <!-- ================= PRODUCT CARD ================= -->
+                <div class="product-card">
 
-            <div class="product-card">
+                    <div class="product-image-container">
 
-                <!-- IMAGE -->
+                        <% if (imageSrc != null
+                                && !imageSrc.isEmpty()) { %>
 
-                <div class="product-image">
-
-                    <% if (!imageUrl.isEmpty()) { %>
-
-                        <img
-                            src="<%= imageUrl %>"
-                            alt="<%= product.getName() %>"
-                            onerror="
-                                this.style.display='none';
-                                this.nextElementSibling.style.display='block';
-                            "
-                        >
-
-                        <div
-                            class="no-image"
-                            style="display:none;"
-                        >
-                            Image unavailable
-                        </div>
-
-                    <% } else { %>
-
-                        <div class="no-image">
-                            No Image
-                        </div>
-
-                    <% } %>
-
-                </div>
-
-                <!-- ================= PRODUCT INFORMATION ================= -->
-
-                <div class="product-info">
-
-                    <!-- DRESS NAME -->
-
-                    <div class="product-name">
-
-                        <%= product.getName() %>
-
-                    </div>
-
-
-                    <!-- ================= PRODUCT COLOUR ================= -->
-
-                    <%
-                        String productColor = product.getColor();
-                    %>
-
-                    <% if (productColor != null &&
-                           !productColor.trim().isEmpty()) { %>
-
-                        <div class="product-color">
-
-                            <%= productColor %>
-
-                        </div>
-
-                    <% } %>
-
-
-                    <!-- CATEGORY -->
-
-                    <div class="category">
-
-                        <%= product.getCategory() %>
-
-                    </div>
-
-
-                    <!-- DESCRIPTION -->
-
-                    <div class="description">
-
-                        <%= product.getDescription() == null
-                                ? "Premium quality product."
-                                : product.getDescription() %>
-
-                    </div>
-
-
-                    <!-- PRICE -->
-
-                    <div class="price">
-
-                        ₹<%= product.getPrice() %>
-
-                    </div>
-
-
-                    <!-- STOCK -->
-
-                    <% if (product.getStockQuantity() > 0) { %>
-
-                        <div class="stock in-stock">
-
-                            ✓
-                            <%= product.getStockQuantity() %>
-                            available
-
-                        </div>
-
-                    <% } else { %>
-
-                        <div class="stock out-stock">
-
-                            ✕ Out of stock
-
-                        </div>
-
-                    <% } %>
-
-
-                    <!-- ================= ACTION BUTTONS ================= -->
-
-                    <div class="product-actions">
-
-                        <!-- ADD TO WISHLIST -->
-
-                        <form
-                            action="<%= contextPath %>/wishlist"
-                            method="post"
-                        >
-
-                            <input
-                                type="hidden"
-                                name="action"
-                                value="add"
+                            <img
+                                src="<%= imageSrc %>"
+                                alt="<%= product.getName() %>"
+                                class="product-image"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                             >
 
-                            <input
-                                type="hidden"
-                                name="productId"
-                                value="<%= product.getProductId() %>"
+                            <div
+                                class="no-image"
+                                style="display:none;"
                             >
+                                No Image Available
+                            </div>
 
-                            <button
-                                type="submit"
-                                class="wishlist-btn"
+                        <% } else { %>
+
+                            <div class="no-image">
+                                No Image Available
+                            </div>
+
+                        <% } %>
+
+                    </div>
+
+
+                    <div class="product-info">
+
+                        <div class="product-name">
+                            <%= product.getName() %>
+                        </div>
+
+
+                        <div class="product-category">
+                            Category:
+                            <%= product.getCategory() %>
+                        </div>
+
+
+                        <div class="product-price">
+                            &#8377;<%= product.getPrice() %>
+                        </div>
+
+
+                        <div class="product-stock">
+
+                            <% if (product.getStockQuantity() > 0) { %>
+
+                                In Stock:
+                                <%= product.getStockQuantity() %>
+
+                            <% } else { %>
+
+                                <span style="color:#dc2626;">
+                                    Out of Stock
+                                </span>
+
+                            <% } %>
+
+                        </div>
+
+
+                        <div class="product-actions">
+
+                            <a
+                                href="<%= contextPath %>/product-details?id=<%= product.getProductId() %>"
+                                class="btn btn-view"
                             >
-                                ❤️ Add to Wishlist
-                            </button>
-
-                        </form>
+                                View Product
+                            </a>
 
 
-                        <!-- VIEW PRODUCT -->
+                            <% if (product.getStockQuantity() > 0) { %>
 
-                        <a
-                            class="details-btn"
-                            href="<%= contextPath %>/product-details?id=<%= product.getProductId() %>"
-                        >
-                            👗 View Product
-                        </a>
+                                <form
+                                    action="<%= contextPath %>/wishlist"
+                                    method="post"
+                                    class="wishlist-form"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="add"
+                                    >
+
+                                    <input
+                                        type="hidden"
+                                        name="productId"
+                                        value="<%= product.getProductId() %>"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-wishlist"
+                                    >
+                                        &#10084;&#65039; Wishlist
+                                    </button>
+
+                                </form>
+
+                            <% } %>
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
 
             <% } %>
 

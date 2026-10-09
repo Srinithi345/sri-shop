@@ -26,8 +26,8 @@ public class ReviewServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null ||
-                session.getAttribute("userId") == null) {
+        if (session == null
+                || session.getAttribute("userId") == null) {
 
             response.sendRedirect(
                     request.getContextPath() + "/login.jsp"
@@ -35,8 +35,23 @@ public class ReviewServlet extends HttpServlet {
             return;
         }
 
-        long buyerId =
-                (Long) session.getAttribute("userId");
+        long buyerId;
+
+        try {
+
+            buyerId = Long.parseLong(
+                    String.valueOf(
+                            session.getAttribute("userId")
+                    )
+            );
+
+        } catch (Exception e) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login.jsp"
+            );
+            return;
+        }
 
         try {
 
@@ -64,10 +79,12 @@ public class ReviewServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
+
         HttpSession session = request.getSession(false);
 
-        if (session == null ||
-                session.getAttribute("userId") == null) {
+        if (session == null
+                || session.getAttribute("userId") == null) {
 
             response.sendRedirect(
                     request.getContextPath() + "/login.jsp"
@@ -75,8 +92,23 @@ public class ReviewServlet extends HttpServlet {
             return;
         }
 
-        long buyerId =
-                (Long) session.getAttribute("userId");
+        long buyerId;
+
+        try {
+
+            buyerId = Long.parseLong(
+                    String.valueOf(
+                            session.getAttribute("userId")
+                    )
+            );
+
+        } catch (Exception e) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login.jsp"
+            );
+            return;
+        }
 
         String action =
                 request.getParameter("action");
@@ -85,23 +117,71 @@ public class ReviewServlet extends HttpServlet {
 
             if ("add".equals(action)) {
 
-                long productId =
-                        Long.parseLong(
-                                request.getParameter("productId")
-                        );
+                String productIdValue =
+                        request.getParameter("productId");
 
-                int rating =
-                        Integer.parseInt(
-                                request.getParameter("rating")
-                        );
+                String ratingValue =
+                        request.getParameter("rating");
 
                 String comment =
                         request.getParameter("comment");
 
+                if (productIdValue == null
+                        || productIdValue.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Product ID is required."
+                    );
+                    return;
+                }
+
+                if (ratingValue == null
+                        || ratingValue.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Rating is required."
+                    );
+                    return;
+                }
+
+                long productId =
+                        Long.parseLong(
+                                productIdValue.trim()
+                        );
+
+                int rating =
+                        Integer.parseInt(
+                                ratingValue.trim()
+                        );
+
                 if (rating < 1 || rating > 5) {
+
                     response.sendError(
                             HttpServletResponse.SC_BAD_REQUEST,
                             "Rating must be between 1 and 5."
+                    );
+                    return;
+                }
+
+                if (comment == null
+                        || comment.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Review comment cannot be empty."
+                    );
+                    return;
+                }
+
+                comment = comment.trim();
+
+                if (comment.length() > 1000) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Review comment is too long."
                     );
                     return;
                 }
@@ -127,9 +207,22 @@ public class ReviewServlet extends HttpServlet {
 
             else if ("delete".equals(action)) {
 
+                String reviewIdValue =
+                        request.getParameter("reviewId");
+
+                if (reviewIdValue == null
+                        || reviewIdValue.trim().isEmpty()) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Review ID is required."
+                    );
+                    return;
+                }
+
                 long reviewId =
                         Long.parseLong(
-                                request.getParameter("reviewId")
+                                reviewIdValue.trim()
                         );
 
                 reviewDAO.deleteReview(

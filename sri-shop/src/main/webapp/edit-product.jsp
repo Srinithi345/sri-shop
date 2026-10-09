@@ -41,7 +41,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>Sri Shop - Edit Product</title>
+<title>SRI SHOP - Edit Product</title>
 
 <style>
 
@@ -84,7 +84,6 @@ body {
     background: white;
     padding: 35px;
     border-radius: 20px;
-
     box-shadow:
         0 10px 30px
         rgba(0,0,0,0.08);
@@ -244,7 +243,6 @@ textarea {
 
 </div>
 
-
 <div class="container">
 
     <div class="form-card">
@@ -257,7 +255,6 @@ textarea {
             Update your product details and inventory.
         </p>
 
-
         <div class="product-id">
 
             Product ID:
@@ -265,11 +262,8 @@ textarea {
 
         </div>
 
-
         <%
-
             if (error != null && !error.isBlank()) {
-
         %>
 
             <div class="error">
@@ -277,20 +271,15 @@ textarea {
             </div>
 
         <%
-
             }
-
         %>
-
 
         <form method="post"
               action="${pageContext.request.contextPath}/edit-product">
 
-
             <input type="hidden"
                    name="productId"
                    value="<%= product.getProductId() %>">
-
 
             <div class="form-group">
 
@@ -305,7 +294,6 @@ textarea {
 
             </div>
 
-
             <div class="form-group">
 
                 <label>
@@ -316,7 +304,6 @@ textarea {
                     name="description"><%= product.getDescription() == null ? "" : product.getDescription() %></textarea>
 
             </div>
-
 
             <div class="row">
 
@@ -358,10 +345,14 @@ textarea {
                             Lehenga
                         </option>
 
+                        <option value="Accessories"
+                            <%= "Accessories".equalsIgnoreCase(product.getCategory()) ? "selected" : "" %>>
+                            Accessories
+                        </option>
+
                     </select>
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -407,7 +398,6 @@ textarea {
 
             </div>
 
-
             <div class="row">
 
                 <div class="form-group">
@@ -422,7 +412,6 @@ textarea {
                            required>
 
                 </div>
-
 
                 <div class="form-group">
 
@@ -441,7 +430,6 @@ textarea {
 
             </div>
 
-
             <div class="form-group">
 
                 <label>
@@ -456,7 +444,6 @@ textarea {
 
             </div>
 
-
             <div class="form-group">
 
                 <label>
@@ -470,7 +457,6 @@ textarea {
 
             </div>
 
-
             <div class="btn-row">
 
                 <button type="submit"
@@ -479,7 +465,6 @@ textarea {
                     💾 Update Product
 
                 </button>
-
 
                 <a class="back-btn"
                    href="${pageContext.request.contextPath}/seller-dashboard">

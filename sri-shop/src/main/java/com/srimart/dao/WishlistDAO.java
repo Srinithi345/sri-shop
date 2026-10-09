@@ -18,7 +18,8 @@ public class WishlistDAO {
                 """;
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
 
             statement.setInt(1, buyerId);
             statement.setInt(2, productId);
@@ -39,7 +40,8 @@ public class WishlistDAO {
                 """;
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
 
             statement.setInt(1, buyerId);
             statement.setInt(2, productId);
@@ -61,7 +63,8 @@ public class WishlistDAO {
                 """;
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
 
             statement.setInt(1, buyerId);
             statement.setInt(2, productId);
@@ -81,14 +84,23 @@ public class WishlistDAO {
         List<Wishlist> wishlistItems = new ArrayList<>();
 
         String sql = """
-                SELECT wishlist_id, buyer_id, product_id, created_at
-                FROM wishlist
-                WHERE buyer_id = ?
-                ORDER BY created_at DESC
+                SELECT w.wishlist_id,
+                       w.buyer_id,
+                       w.product_id,
+                       w.created_at,
+                       p.name AS product_name,
+                       p.price AS product_price,
+                       p.image_url AS product_image
+                FROM wishlist w
+                JOIN products p
+                  ON p.product_id = w.product_id
+                WHERE w.buyer_id = ?
+                ORDER BY w.created_at DESC
                 """;
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
 
             statement.setInt(1, buyerId);
 
@@ -99,20 +111,25 @@ public class WishlistDAO {
                     Wishlist wishlist = new Wishlist();
 
                     wishlist.setWishlistId(
-                            resultSet.getInt("wishlist_id")
-                    );
+                            resultSet.getInt("wishlist_id"));
 
                     wishlist.setBuyerId(
-                            resultSet.getInt("buyer_id")
-                    );
+                            resultSet.getInt("buyer_id"));
 
                     wishlist.setProductId(
-                            resultSet.getInt("product_id")
-                    );
+                            resultSet.getInt("product_id"));
 
                     wishlist.setCreatedAt(
-                            resultSet.getTimestamp("created_at")
-                    );
+                            resultSet.getTimestamp("created_at"));
+
+                    wishlist.setProductName(
+                            resultSet.getString("product_name"));
+
+                    wishlist.setProductPrice(
+                            resultSet.getBigDecimal("product_price"));
+
+                    wishlist.setProductImage(
+                            resultSet.getString("product_image"));
 
                     wishlistItems.add(wishlist);
                 }
@@ -134,12 +151,12 @@ public class WishlistDAO {
                 """;
 
         try (Connection connection = DBConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement =
+                     connection.prepareStatement(sql)) {
 
             statement.setInt(1, buyerId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
-
                 if (resultSet.next()) {
                     return resultSet.getInt(1);
                 }
