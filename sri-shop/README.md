@@ -1,6 +1,3 @@
-cd "C:\Users\acer\Desktop\sri shop\sri-shop"
-
-@'
 # SRI SHOP – Online Dress Shopping System
 
 ## Project Overview
