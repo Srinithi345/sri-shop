@@ -469,168 +469,61 @@ body {
             <a class="view-btn" href="<%= contextPath %>/orders">View All Orders</a>
         </div>
 
-        <div class="panel">
-            <h2>🛒 Cart Preview</h2>
+       <div class="panel">
+    <h2>🛒 Cart Preview</h2>
 
-            <% if (cartPreview != null && !cartPreview.isEmpty()) {
-                for (Map<String, Object> item : cartPreview) { %>
-                    <div class="cart-item">
-                        <div>
-                            <div class="cart-name"><%= item.get("product_name") %></div>
-                            <div class="cart-details">Quantity: <%= item.get("quantity") %></div>
-                        </div>
-                        <div class="cart-price">₹<%= item.get("subtotal") %></div>
+    <% if (cartPreview != null && !cartPreview.isEmpty()) {
+        for (Map<String, Object> item : cartPreview) {
+    %>
+        <div class="cart-item">
+            <div>
+                <div class="cart-name">
+                    <%= item.get("name") != null
+                            ? item.get("name") : "Dress" %>
+                </div>
+
+                <div class="cart-details">
+                    Quantity:
+                    <%= item.get("quantity") != null
+                            ? item.get("quantity") : 1 %>
+                </div>
+
+                <% if (item.get("size") != null) { %>
+                    <div class="cart-details">
+                        Size: <%= item.get("size") %>
                     </div>
-            <%  }
-               } else { %>
-                <div class="empty">Your cart is empty.</div>
-            <% } %>
+                <% } %>
 
-            <div class="cart-total">
-                <span>Cart Total</span>
-                <span class="cart-total-value">₹<%= cartTotal %></span>
+                <% if (item.get("color") != null) { %>
+                    <div class="cart-details">
+                        Color: <%= item.get("color") %>
+                    </div>
+                <% } %>
             </div>
 
-            <a class="view-btn" href="<%= contextPath %>/cart">View Cart</a>
+            <div class="cart-price">
+                ₹<%= item.get("itemTotal") != null
+                        ? item.get("itemTotal") : "0.00" %>
+            </div>
         </div>
-    </div>
-</div>
-
-<button class="chat-button" id="chatToggle" type="button"
-        aria-label="Open SRI BOT" aria-expanded="false">💬</button>
-
-<div id="chatWindow" class="chat-window" role="dialog" aria-label="SRI BOT chat">
-    <div class="chat-header">
-        <span>🤖 SRI BOT</span>
-        <button class="chat-close" id="chatClose" type="button" aria-label="Close chat">×</button>
-    </div>
-
-    <div id="chatMessages" class="chat-body" aria-live="polite">
-        <div class="bot-message">
-            Hello! Welcome to SRI SHOP. 👋<br><br>
-            I can help you find dresses, accessories, cart, orders, wishlist and profile.
+    <%  }
+       } else { %>
+        <div class="empty">
+            Your cart is empty.
+            <br>
+            <a href="<%= contextPath %>/products">Shop Dresses</a>
         </div>
+    <% } %>
+
+    <div class="cart-total">
+        <span>Cart Total</span>
+        <span class="cart-total-value">
+            ₹<%= cartTotal != null ? cartTotal : java.math.BigDecimal.ZERO %>
+        </span>
     </div>
 
-    <form id="chatForm" class="chat-form">
-        <input id="chatInput" type="text" maxlength="500"
-               placeholder="Type your message..." autocomplete="off" required>
-        <button id="chatSend" type="submit">Send</button>
-    </form>
+    <a class="view-btn"
+       href="<%= contextPath %>/cart">
+        View Cart
+    </a>
 </div>
-
-<script>
-(function () {
-    "use strict";
-
-    const chatWindow = document.getElementById("chatWindow");
-    const chatToggle = document.getElementById("chatToggle");
-    const chatClose = document.getElementById("chatClose");
-    const chatForm = document.getElementById("chatForm");
-    const chatInput = document.getElementById("chatInput");
-    const chatMessages = document.getElementById("chatMessages");
-
-    function openChat() {
-        chatWindow.style.display = "block";
-        chatToggle.setAttribute("aria-expanded", "true");
-        chatInput.focus();
-    }
-
-    function closeChat() {
-        chatWindow.style.display = "none";
-        chatToggle.setAttribute("aria-expanded", "false");
-        chatToggle.focus();
-    }
-
-    chatToggle.addEventListener("click", function () {
-        if (chatWindow.style.display === "block") {
-            closeChat();
-        } else {
-            openChat();
-        }
-    });
-
-    chatClose.addEventListener("click", closeChat);
-
-    function addMessage(text, className) {
-        const message = document.createElement("div");
-        message.className = className;
-        message.textContent = text;
-        chatMessages.appendChild(message);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function getBotReply(input) {
-        const msg = input.toLowerCase().trim();
-
-        if (/^(hi|hello|hey|vanakkam)\b/.test(msg)) {
-            return "Hello! 😊 Welcome to SRI SHOP. What would you like help with?";
-        }
-
-        if (msg.includes("dress") || msg.includes("product") ||
-            msg.includes("shop") || msg.includes("buy")) {
-            return "You can browse dresses and products using the Shop menu at the top of the page.";
-        }
-
-        if (msg.includes("accessor")) {
-            return "You can explore Accessories from the Accessories menu.";
-        }
-
-        if (msg.includes("cart")) {
-            return "Click Cart in the top menu to view or manage your cart.";
-        }
-
-        if (msg.includes("order") || msg.includes("track") ||
-            msg.includes("delivery") || msg.includes("status")) {
-            return "Open My Orders to check your order history and available order status.";
-        }
-
-        if (msg.includes("wish") || msg.includes("favourite") ||
-            msg.includes("favorite")) {
-            return "Click Wishlist to view your saved favourite products.";
-        }
-
-        if (msg.includes("profile") || msg.includes("account") ||
-            msg.includes("password")) {
-            return "Open Profile to view or manage your account settings.";
-        }
-
-        if (msg.includes("search")) {
-            return "Use the search bar in the header to search for products.";
-        }
-
-        if (msg.includes("thank")) {
-            return "You're welcome! 💚 Happy shopping at SRI SHOP.";
-        }
-
-        if (msg.includes("bye")) {
-            return "Goodbye! 👋 Thanks for visiting SRI SHOP.";
-        }
-
-        if (msg.includes("help")) {
-            return "I can help with dresses, accessories, searching products, cart, orders, wishlist and profile.";
-        }
-
-        return "I can help with dresses, accessories, cart, orders, wishlist and profile. Try asking about one of these!";
-    }
-
-    chatForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const text = chatInput.value.trim();
-        if (!text) return;
-
-        addMessage(text, "user-message");
-        chatInput.value = "";
-
-        const reply = getBotReply(text);
-
-        window.setTimeout(function () {
-            addMessage(reply, "bot-message");
-        }, 250);
-    });
-})();
-</script>
-
-</body>
-</html>

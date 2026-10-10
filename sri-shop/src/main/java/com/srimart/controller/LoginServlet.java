@@ -88,7 +88,7 @@ public class LoginServlet extends HttpServlet {
 
                 response.sendRedirect(
                         request.getContextPath()
-                                + "/buyer-dashboard.jsp"
+                              + "/buyer-dashboard"
                 );
             }
 

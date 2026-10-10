@@ -1,3 +1,4 @@
+
 package com.srimart.controller;
 
 import com.srimart.dao.CartDAO;
@@ -15,7 +16,6 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -40,24 +40,27 @@ public class BuyerDashboardServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null ||
-                session.getAttribute("userId") == null) {
+        if (session == null
+                || session.getAttribute("userId") == null) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login.jsp"
-            );
+                    request.getContextPath() + "/login.jsp");
             return;
         }
 
-        long buyerId =
-                (Long) session.getAttribute("userId");
+        Object userIdValue = session.getAttribute("userId");
+
+        if (!(userIdValue instanceof Number)) {
+            session.invalidate();
+            response.sendRedirect(
+                    request.getContextPath() + "/login.jsp");
+            return;
+        }
+
+        long buyerId = ((Number) userIdValue).longValue();
 
         try {
-
-            // ==============================
             // ORDER SUMMARY
-            // ==============================
-
             int totalOrders =
                     orderDAO.getTotalOrdersByBuyer(buyerId);
 
@@ -70,270 +73,163 @@ public class BuyerDashboardServlet extends HttpServlet {
             BigDecimal totalSpent =
                     orderDAO.getTotalSpentByBuyer(buyerId);
 
-
-            // ==============================
             // CART SUMMARY
-            // ==============================
-
             int cartItemCount =
                     cartDAO.getCartItemCount(buyerId);
 
             BigDecimal cartTotal =
                     cartDAO.getCartTotal(buyerId);
 
+            if (cartTotal == null) {
+                cartTotal = BigDecimal.ZERO;
+            }
 
-            // ==============================
             // CART PRODUCTS
-            // ==============================
-
             List<CartItem> cartItems =
                     cartDAO.getCartItems(buyerId);
 
             List<Product> products =
                     productDAO.getAllProducts();
 
-            Map<Long, Product> productMap =
-                    new HashMap<>();
+            Map<Long, Product> productMap = new HashMap<>();
 
-            for (Product product : products) {
-
-                productMap.put(
-                        product.getProductId(),
-                        product
-                );
+            if (products != null) {
+                for (Product product : products) {
+                    if (product != null) {
+                        productMap.put(
+                                product.getProductId(),
+                                product);
+                    }
+                }
             }
-
-
-            // Create dashboard cart preview
 
             List<Map<String, Object>> cartPreview =
                     new ArrayList<>();
 
-            int previewCount = 0;
+            if (cartItems != null) {
+                for (CartItem item : cartItems) {
+                    if (cartPreview.size() >= 3) {
+                        break;
+                    }
 
-            for (CartItem item : cartItems) {
+                    if (item == null) {
+                        continue;
+                    }
 
-                if (previewCount >= 3) {
-                    break;
+                    Product product =
+                            productMap.get(item.getProductId());
+
+                    if (product == null) {
+                        continue;
+                    }
+
+                    Map<String, Object> cart = new HashMap<>();
+
+                    cart.put("productId", item.getProductId());
+                    cart.put("name", product.getName());
+                    cart.put("price", product.getPrice());
+                    cart.put("imageUrl", product.getImageUrl());
+                    cart.put("quantity", item.getQuantity());
+                    cart.put("size", item.getSize());
+                    cart.put("color", item.getColor());
+
+                    BigDecimal price = product.getPrice();
+
+                    if (price == null) {
+                        price = BigDecimal.ZERO;
+                    }
+
+                    BigDecimal itemTotal = price.multiply(
+                            BigDecimal.valueOf(item.getQuantity()));
+
+                    cart.put("itemTotal", itemTotal);
+
+                    // Keep JSP keys consistent with this map:
+                    // name, imageUrl, quantity, size, color, itemTotal
+                    cartPreview.add(cart);
                 }
-
-                Product product =
-                        productMap.get(
-                                item.getProductId()
-                        );
-
-                if (product == null) {
-                    continue;
-                }
-
-                Map<String, Object> cart =
-                        new HashMap<>();
-
-                cart.put(
-                        "productId",
-                        item.getProductId()
-                );
-
-                cart.put(
-                        "name",
-                        product.getName()
-                );
-
-                cart.put(
-                        "price",
-                        product.getPrice()
-                );
-
-                cart.put(
-                        "imageUrl",
-                        product.getImageUrl()
-                );
-
-                cart.put(
-                        "size",
-                        item.getSize()
-                );
-
-                cart.put(
-                        "color",
-                        item.getColor()
-                );
-
-                cart.put(
-                        "quantity",
-                        item.getQuantity()
-                );
-
-                BigDecimal itemTotal =
-                        product.getPrice()
-                                .multiply(
-                                        BigDecimal.valueOf(
-                                                item.getQuantity()
-                                        )
-                                );
-
-                cart.put(
-                        "itemTotal",
-                        itemTotal
-                );
-
-                cartPreview.add(cart);
-
-                previewCount++;
             }
 
-
-            // ==============================
             // RECENT ORDERS
-            // ==============================
-
             List<Map<String, Object>> recentOrders =
                     new ArrayList<>();
 
             ResultSet resultSet = null;
             Statement statement = null;
-            Connection connection = null;
 
             try {
+                resultSet = orderDAO.getOrdersByBuyer(buyerId);
 
-                resultSet =
-                        orderDAO.getOrdersByBuyer(buyerId);
+                if (resultSet != null) {
+                    statement = resultSet.getStatement();
 
-                statement =
-                        resultSet.getStatement();
+                    int count = 0;
 
-                connection =
-                        statement.getConnection();
+                    while (resultSet.next() && count < 3) {
+                        Map<String, Object> order =
+                                new HashMap<>();
 
-                int count = 0;
+                        order.put(
+                                "orderId",
+                                resultSet.getLong("order_id"));
 
-                while (resultSet.next() && count < 3) {
+                        order.put(
+                                "totalAmount",
+                                resultSet.getBigDecimal("total_amount"));
 
-                    Map<String, Object> order =
-                            new HashMap<>();
+                        order.put(
+                                "status",
+                                resultSet.getString("status"));
 
-                    order.put(
-                            "orderId",
-                            resultSet.getLong("order_id")
-                    );
+                        order.put(
+                                "shippingAddress",
+                                resultSet.getString("shipping_address"));
 
-                    order.put(
-                            "totalAmount",
-                            resultSet.getBigDecimal(
-                                    "total_amount"
-                            )
-                    );
+                        order.put(
+                                "createdAt",
+                                resultSet.getTimestamp("created_at"));
 
-                    order.put(
-                            "status",
-                            resultSet.getString(
-                                    "status"
-                            )
-                    );
-
-                    order.put(
-                            "shippingAddress",
-                            resultSet.getString(
-                                    "shipping_address"
-                            )
-                    );
-
-                    order.put(
-                            "createdAt",
-                            resultSet.getTimestamp(
-                                    "created_at"
-                            )
-                    );
-
-                    recentOrders.add(order);
-
-                    count++;
+                        recentOrders.add(order);
+                        count++;
+                    }
                 }
-
             } finally {
-
-                try {
-                    if (resultSet != null) {
+                if (resultSet != null) {
+                    try {
                         resultSet.close();
+                    } catch (Exception ignored) {
                     }
-                } catch (Exception ignored) {
                 }
 
-                try {
-                    if (statement != null) {
+                if (statement != null) {
+                    try {
                         statement.close();
+                    } catch (Exception ignored) {
                     }
-                } catch (Exception ignored) {
-                }
-
-                try {
-                    if (connection != null) {
-                        connection.close();
-                    }
-                } catch (Exception ignored) {
                 }
             }
 
-
-            // ==============================
             // SEND DATA TO JSP
-            // ==============================
-
+            request.setAttribute("totalOrders", totalOrders);
+            request.setAttribute("totalItems", totalItems);
             request.setAttribute(
-                    "totalOrders",
-                    totalOrders
-            );
+                    "differentVarieties", differentVarieties);
+            request.setAttribute("totalSpent", totalSpent);
 
-            request.setAttribute(
-                    "totalItems",
-                    totalItems
-            );
+            request.setAttribute("cartItemCount", cartItemCount);
+            request.setAttribute("cartTotal", cartTotal);
+            request.setAttribute("cartPreview", cartPreview);
 
-            request.setAttribute(
-                    "differentVarieties",
-                    differentVarieties
-            );
+            request.setAttribute("recentOrders", recentOrders);
 
-            request.setAttribute(
-                    "totalSpent",
-                    totalSpent
-            );
-
-            request.setAttribute(
-                    "cartItemCount",
-                    cartItemCount
-            );
-
-            request.setAttribute(
-                    "cartTotal",
-                    cartTotal
-            );
-
-            request.setAttribute(
-                    "cartPreview",
-                    cartPreview
-            );
-
-            request.setAttribute(
-                    "recentOrders",
-                    recentOrders
-            );
-
-
-            // ==============================
-            // OPEN DASHBOARD
-            // ==============================
-
+            // FORWARD TO DASHBOARD JSP
             request.getRequestDispatcher(
-                    "/buyer-dashboard.jsp"
-            ).forward(request, response);
+                    "/buyer-dashboard.jsp")
+                    .forward(request, response);
 
         } catch (Exception e) {
-
             throw new ServletException(
-                    "Unable to load buyer dashboard.",
-                    e
-            );
+                    "Unable to load buyer dashboard.", e);
         }
     }
 }
